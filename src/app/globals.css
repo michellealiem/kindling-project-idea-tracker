@@ -70,7 +70,7 @@
   --secondary: #2d2926;
   --secondary-foreground: #c4bdb3;
   --muted: #3a3532;
-  --muted-foreground: #9c958b;
+  --muted-foreground: #b8b0a5;
   --border: #3a3532;
 
   /* Slightly brighter accents for dark mode */
@@ -99,7 +99,7 @@
     --secondary: #2d2926;
     --secondary-foreground: #c4bdb3;
     --muted: #3a3532;
-    --muted-foreground: #9c958b;
+    --muted-foreground: #b8b0a5;
     --border: #3a3532;
 
     --primary: #14a3a8;

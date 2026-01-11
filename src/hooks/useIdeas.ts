@@ -9,11 +9,11 @@ import {
   SearchFilters,
 } from '@/lib/types';
 import {
-  getData,
-  saveData,
-  createIdea,
-  updateIdea as updateIdeaInData,
-  deleteIdea as deleteIdeaFromData,
+  getData as getLocalData,
+  saveData as saveLocalData,
+  createIdea as createLocalIdea,
+  updateIdea as updateIdeaInLocalData,
+  deleteIdea as deleteIdeaFromLocalData,
   addTheme,
   addLearning,
   downloadData,
@@ -21,46 +21,131 @@ import {
   getStats,
 } from '@/lib/storage';
 
+// Check if Google Sheets is configured
+const isGoogleSheetsConfigured = () => {
+  // This will be true if the API is working
+  // We'll detect this by trying the API and falling back
+  return true;
+};
+
 export function useIdeas() {
   const [data, setData] = useState<AppData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [useApi, setUseApi] = useState(true);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
-  // Load data on mount
+  // Load data on mount - try API first, fall back to localStorage
   useEffect(() => {
-    const loaded = getData();
-    setData(loaded);
-    setIsLoading(false);
-  }, []);
+    async function loadData() {
+      if (useApi) {
+        try {
+          const response = await fetch('/api/data');
+          if (response.ok) {
+            const apiData = await response.json();
+            setData(apiData);
+            // Also save to localStorage as backup
+            saveLocalData(apiData);
+            setSyncError(null);
+          } else {
+            throw new Error('API returned error');
+          }
+        } catch {
+          console.log('API unavailable, using localStorage');
+          setUseApi(false);
+          const localData = getLocalData();
+          setData(localData);
+          setSyncError('Using offline mode - Google Sheets not configured');
+        }
+      } else {
+        const localData = getLocalData();
+        setData(localData);
+      }
+      setIsLoading(false);
+    }
 
-  // Save whenever data changes
+    loadData();
+  }, [useApi]);
+
+  // Save to localStorage whenever data changes (backup)
   useEffect(() => {
     if (data && !isLoading) {
-      saveData(data);
+      saveLocalData(data);
     }
   }, [data, isLoading]);
 
-  // Idea operations
-  const addIdea = useCallback((idea: Omit<Idea, 'id' | 'createdAt' | 'updatedAt' | 'stageHistory'>) => {
+  // Idea operations with API support
+  const addIdea = useCallback(async (idea: Omit<Idea, 'id' | 'createdAt' | 'updatedAt' | 'stageHistory'>) => {
+    // Optimistically update local state
+    const localIdea = createLocalIdea(idea);
     setData((prev) => {
       if (!prev) return prev;
-      const newIdea = createIdea(idea);
-      return { ...prev, ideas: [...prev.ideas, newIdea] };
+      return { ...prev, ideas: [...prev.ideas, localIdea] };
     });
-  }, []);
 
-  const updateIdea = useCallback((id: string, updates: Partial<Idea>) => {
-    setData((prev) => {
-      if (!prev) return prev;
-      return updateIdeaInData(prev, id, updates);
-    });
-  }, []);
+    // Try to sync with API
+    if (useApi) {
+      try {
+        const response = await fetch('/api/ideas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(idea),
+        });
+        if (response.ok) {
+          const apiIdea = await response.json();
+          // Update with the API-generated idea (may have different ID)
+          setData((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              ideas: prev.ideas.map(i => i.id === localIdea.id ? apiIdea : i)
+            };
+          });
+        }
+      } catch (error) {
+        console.error('Failed to sync new idea to API:', error);
+      }
+    }
+  }, [useApi]);
 
-  const deleteIdea = useCallback((id: string) => {
+  const updateIdea = useCallback(async (id: string, updates: Partial<Idea>) => {
+    // Optimistically update local state
     setData((prev) => {
       if (!prev) return prev;
-      return deleteIdeaFromData(prev, id);
+      return updateIdeaInLocalData(prev, id, updates);
     });
-  }, []);
+
+    // Try to sync with API
+    if (useApi) {
+      try {
+        await fetch(`/api/ideas/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates),
+        });
+      } catch (error) {
+        console.error('Failed to sync update to API:', error);
+      }
+    }
+  }, [useApi]);
+
+  const deleteIdea = useCallback(async (id: string) => {
+    // Optimistically update local state
+    setData((prev) => {
+      if (!prev) return prev;
+      return deleteIdeaFromLocalData(prev, id);
+    });
+
+    // Try to sync with API
+    if (useApi) {
+      try {
+        await fetch(`/api/ideas/${id}`, {
+          method: 'DELETE',
+        });
+      } catch (error) {
+        console.error('Failed to sync delete to API:', error);
+      }
+    }
+  }, [useApi]);
 
   // Theme operations
   const importTheme = useCallback((theme: Omit<Theme, 'id'>) => {
@@ -188,9 +273,33 @@ export function useIdeas() {
     return Array.from(tagSet).sort();
   }, [data]);
 
+  // Manual sync with Google Sheets
+  const syncWithCloud = useCallback(async () => {
+    if (!useApi) {
+      setSyncError('Google Sheets not configured');
+      return false;
+    }
+
+    try {
+      const response = await fetch('/api/data');
+      if (response.ok) {
+        const apiData = await response.json();
+        setData(apiData);
+        setSyncError(null);
+        return true;
+      }
+    } catch (error) {
+      setSyncError('Failed to sync with Google Sheets');
+      console.error('Sync failed:', error);
+    }
+    return false;
+  }, [useApi]);
+
   return {
     data,
     isLoading,
+    syncError,
+    isOnline: useApi,
     stats: data ? getStats(data) : null,
     ideas: data?.ideas ?? [],
     themes: data?.themes ?? [],
@@ -209,5 +318,6 @@ export function useIdeas() {
     updateSettings,
     searchIdeas,
     getAllTags,
+    syncWithCloud,
   };
 }
