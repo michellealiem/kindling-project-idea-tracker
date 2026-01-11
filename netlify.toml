@@ -3,7 +3,7 @@
 
 [build]
   command = "npm run build"
-  # publish directory is auto-detected by the Next.js Runtime
+  publish = ".netlify"
 
 [build.environment]
   NODE_VERSION = "20"
