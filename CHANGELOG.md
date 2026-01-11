@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-10-C] - GitHub & Netlify Setup
+
+### Added
+- Connected repository to GitHub: `michellealiem/kindling-project-idea-tracker`
+- Configured Netlify auto-deployment from main branch
+- Security headers in `netlify.toml` (X-Frame-Options, HSTS, etc.)
+- Static asset caching configuration
+
+### Infrastructure
+- Repository: https://github.com/michellealiem/kindling-project-idea-tracker
+- Hosting: Netlify (auto-deploys on push to main)
+
+---
+
 ## [2026-01-10-B] - Rebrand to Kindling (Fire Theme)
 
 ### Changed
