@@ -5,8 +5,21 @@ import { GoogleSpreadsheet, GoogleSpreadsheetRow } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { Idea, Theme, Learning, AppData, Stage, IdeaType, Effort } from './types';
 
+// Check if Google Sheets is properly configured
+export function isGoogleSheetsConfigured(): boolean {
+  return !!(
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
+    process.env.GOOGLE_PRIVATE_KEY &&
+    process.env.GOOGLE_SHEET_ID
+  );
+}
+
 // Initialize auth - uses service account credentials
 function getAuth() {
+  if (!isGoogleSheetsConfigured()) {
+    throw new Error('Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, and GOOGLE_SHEET_ID environment variables.');
+  }
+
   const credentials = {
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
     key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),

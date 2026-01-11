@@ -1,13 +1,12 @@
-# Netlify configuration for Idea Forge
-# Auto-deploys from GitHub
+# Netlify configuration for Kindling
+# Auto-deploys from GitHub - Next.js handled automatically by OpenNext adapter
 
 [build]
   command = "npm run build"
   publish = ".next"
 
-# Next.js on Netlify plugin
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+[build.environment]
+  NODE_VERSION = "20"
 
 # Security headers
 [[headers]]

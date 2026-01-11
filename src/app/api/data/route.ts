@@ -1,16 +1,25 @@
 // API route for full data sync
 import { NextResponse } from 'next/server';
-import { getAllData, initializeSheets } from '@/lib/google-sheets';
+import { getAllData, initializeSheets, isGoogleSheetsConfigured } from '@/lib/google-sheets';
 
 // GET /api/data - Get all data (ideas, themes, learnings)
 export async function GET() {
+  // Check if Google Sheets is configured
+  if (!isGoogleSheetsConfigured()) {
+    return NextResponse.json(
+      { error: 'Google Sheets not configured', configured: false },
+      { status: 503 }
+    );
+  }
+
   try {
     const data = await getAllData();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to fetch data:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to fetch data' },
+      { error: 'Failed to fetch data', details: errorMessage },
       { status: 500 }
     );
   }

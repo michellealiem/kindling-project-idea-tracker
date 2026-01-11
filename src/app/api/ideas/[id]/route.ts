@@ -1,12 +1,19 @@
 // API routes for single Idea operations
 import { NextRequest, NextResponse } from 'next/server';
-import { getIdea, updateIdea as updateIdeaInSheet, deleteIdea as deleteIdeaFromSheet } from '@/lib/google-sheets';
+import { getIdea, updateIdea as updateIdeaInSheet, deleteIdea as deleteIdeaFromSheet, isGoogleSheetsConfigured } from '@/lib/google-sheets';
 
 // GET /api/ideas/[id] - Get a single idea
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isGoogleSheetsConfigured()) {
+    return NextResponse.json(
+      { error: 'Google Sheets not configured' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { id } = await params;
     const idea = await getIdea(id);
@@ -33,6 +40,13 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isGoogleSheetsConfigured()) {
+    return NextResponse.json(
+      { error: 'Google Sheets not configured' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { id } = await params;
     const updates = await request.json();
@@ -61,6 +75,13 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isGoogleSheetsConfigured()) {
+    return NextResponse.json(
+      { error: 'Google Sheets not configured' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { id } = await params;
     const deleted = await deleteIdeaFromSheet(id);

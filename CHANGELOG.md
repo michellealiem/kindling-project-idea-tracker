@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-F] - Google Sheets Sync Fix
+
+### Fixed
+
+**API Route Error Handling:**
+- Added `isGoogleSheetsConfigured()` check to all API routes
+- Routes now return 503 "Service Unavailable" with clear message when env vars are missing
+- Prevents cryptic crashes when Google Sheets credentials aren't configured
+- App gracefully falls back to localStorage when API returns 503
+
+**Netlify Configuration:**
+- Simplified `netlify.toml` - removed explicit plugin declaration
+- Netlify's OpenNext adapter now handles Next.js automatically
+- Set Node.js version to 20 for build environment
+
+### Files Modified
+- `src/lib/google-sheets.ts` - Added `isGoogleSheetsConfigured()` export
+- `src/app/api/data/route.ts` - Added config check with detailed error response
+- `src/app/api/ideas/route.ts` - Added config check to GET and POST
+- `src/app/api/ideas/[id]/route.ts` - Added config check to GET, PATCH, DELETE
+- `netlify.toml` - Simplified configuration for OpenNext adapter
+
+---
+
 ## [2026-01-11-E] - Timeline Improvements
 
 ### Changed
@@ -321,4 +345,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11E
+**Last Updated:** 2026-01-11F
