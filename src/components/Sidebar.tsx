@@ -11,7 +11,6 @@ import {
   Flame,
   Lightbulb,
   Download,
-  Upload,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -30,7 +29,6 @@ interface SidebarProps {
     permasolutions: number;
   } | null;
   onExport: () => void;
-  onImportClick: () => void;
 }
 
 const navItems = [
@@ -40,7 +38,7 @@ const navItems = [
   { href: '/insights', label: 'Insights', icon: Sparkles },
 ];
 
-export function Sidebar({ stats, onExport, onImportClick }: SidebarProps) {
+export function Sidebar({ stats, onExport }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -125,21 +123,14 @@ export function Sidebar({ stats, onExport, onImportClick }: SidebarProps) {
           <ThemeToggle />
         </div>
 
-        {/* Import/Export */}
-        <div className="p-4 border-t border-[var(--border)] space-y-2">
+        {/* Export */}
+        <div className="p-4 border-t border-[var(--border)]">
           <button
             onClick={onExport}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] rounded-xl color-transition btn-press"
           >
             <Download className="w-4 h-4" />
             Export
-          </button>
-          <button
-            onClick={onImportClick}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] rounded-xl color-transition btn-press"
-          >
-            <Upload className="w-4 h-4" />
-            Import
           </button>
         </div>
       </aside>

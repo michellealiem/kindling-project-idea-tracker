@@ -20,11 +20,14 @@ export function DraggableIdeaCard({ idea, onClick }: DraggableIdeaCardProps) {
     isDragging,
   } = useSortable({ id: idea.id });
 
+  // Add a subtle tilt during drag
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    cursor: 'grab',
+    transform: isDragging
+      ? `${CSS.Transform.toString(transform)} rotate(3deg) scale(1.02)`
+      : CSS.Transform.toString(transform),
+    transition: isDragging ? 'none' : transition,
+    opacity: isDragging ? 0.9 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   return (
@@ -33,7 +36,7 @@ export function DraggableIdeaCard({ idea, onClick }: DraggableIdeaCardProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className={isDragging ? 'z-50' : ''}
+      className={`${isDragging ? 'z-50 shadow-xl shadow-[var(--primary)]/20' : ''} transition-shadow`}
     >
       <IdeaCard idea={idea} onClick={onClick} />
     </div>

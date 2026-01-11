@@ -6,6 +6,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-D] - UX Improvements & Category Refinement
+
+### Changed
+
+**Dashboard Redesign:**
+- Consolidated 7 stat cards into cleaner visual hierarchy
+- 4 primary cards: Ideas, Exploring, Active, Shipped
+- Waiting & Simmering shown as badges under Active card
+- Paused card with muted styling
+- Eternal Flames card with special amber gradient
+
+**Type Order Reversed (shortest to longest duration):**
+- Torch (learning) → Test Spark (experiment) → Campfire (project) → Eternal Flame (permasolution)
+
+**Effort Labels Simplified:**
+- Removed confusing fire metaphors (Quick Strike, Kindling, Campfire, Bonfire, Inferno)
+- Now clear labels: Trivial, Small, Medium, Large, Epic
+
+**Kanban Drag & Drop Improvements:**
+- Cards now tilt 3° and scale up slightly during drag
+- Added shadow glow effect while dragging
+- Improved collision detection - much easier to drop cards into columns
+- Uses pointer-within detection (more forgiving than center-based)
+
+**Chatbot:**
+- Shortened header to "Llama 3.1 via Ollama"
+
+### Removed
+- Import button from sidebar (Export only now)
+
+### Files Modified
+- `src/lib/types.ts` - Reordered TYPE_CONFIG, simplified EFFORT_CONFIG labels
+- `src/app/page.tsx` - Redesigned dashboard stats layout
+- `src/app/kanban/page.tsx` - Custom collision detection for better drops
+- `src/components/DraggableIdeaCard.tsx` - Tilt animation during drag
+- `src/components/IdeaModal.tsx` - Updated type order
+- `src/components/Sidebar.tsx` - Removed Import button
+- `src/components/AppProvider.tsx` - Removed onImportClick prop
+- `src/components/ChatBot.tsx` - Shortened model attribution
+
+---
+
 ## [2026-01-11-C] - ChatBot & Start Date Feature
 
 ### Added
@@ -260,4 +302,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11C
+**Last Updated:** 2026-01-11D

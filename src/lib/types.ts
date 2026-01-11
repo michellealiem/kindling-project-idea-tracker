@@ -120,17 +120,11 @@ export const STAGE_CONFIG: Record<Stage, { label: string; description: string; c
 };
 
 export const TYPE_CONFIG: Record<IdeaType, { label: string; color: string; description: string; longDescription: string }> = {
-  permasolution: {
-    label: 'Eternal Flame',
-    color: 'text-[var(--permasolution)]',
-    description: 'Build once, burns forever',
-    longDescription: 'A solution built once that runs indefinitely without ongoing maintenance. Set it up and forget it.'
-  },
-  project: {
-    label: 'Campfire',
-    color: 'text-[var(--exploring)]',
-    description: 'Needs tending',
-    longDescription: 'A project requiring ongoing attention, updates, or maintenance to keep running.'
+  learning: {
+    label: 'Torch',
+    color: 'text-[var(--primary)]',
+    description: 'Light the way',
+    longDescription: 'Knowledge acquisition - a skill, concept, or domain to explore and understand.'
   },
   experiment: {
     label: 'Test Spark',
@@ -138,20 +132,26 @@ export const TYPE_CONFIG: Record<IdeaType, { label: string; color: string; descr
     description: 'See if it catches',
     longDescription: 'A quick test or prototype to validate an idea before committing more time.'
   },
-  learning: {
-    label: 'Torch',
-    color: 'text-[var(--primary)]',
-    description: 'Light the way',
-    longDescription: 'Knowledge acquisition - a skill, concept, or domain to explore and understand.'
+  project: {
+    label: 'Campfire',
+    color: 'text-[var(--exploring)]',
+    description: 'Needs tending',
+    longDescription: 'A project requiring ongoing attention, updates, or maintenance to keep running.'
+  },
+  permasolution: {
+    label: 'Eternal Flame',
+    color: 'text-[var(--permasolution)]',
+    description: 'Build once, burns forever',
+    longDescription: 'A solution built once that runs indefinitely without ongoing maintenance. Set it up and forget it.'
   },
 };
 
 export const EFFORT_CONFIG: Record<Effort, { label: string; description: string }> = {
-  trivial: { label: 'Quick Strike', description: '< 1 hour' },
-  small: { label: 'Kindling', description: '1-4 hours' },
-  medium: { label: 'Campfire', description: '1-2 days' },
-  large: { label: 'Bonfire', description: '1 week+' },
-  epic: { label: 'Inferno', description: 'Multi-week' },
+  trivial: { label: 'Trivial', description: '< 1 hour' },
+  small: { label: 'Small', description: '1-4 hours' },
+  medium: { label: 'Medium', description: '1-2 days' },
+  large: { label: 'Large', description: '1 week+' },
+  epic: { label: 'Epic', description: 'Multi-week' },
 };
 
 // Search/Filter types

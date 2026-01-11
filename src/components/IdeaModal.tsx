@@ -17,7 +17,7 @@ interface IdeaModalProps {
 }
 
 const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
-const types: IdeaType[] = ['permasolution', 'project', 'experiment', 'learning'];
+const types: IdeaType[] = ['learning', 'experiment', 'project', 'permasolution'];
 const efforts: Effort[] = ['trivial', 'small', 'medium', 'large', 'epic'];
 
 // Stage icons: Idea → Exploring → Active/Waiting/Simmering → Shipped → Paused
@@ -51,6 +51,52 @@ export function IdeaModal({
   const [notes, setNotes] = useState('');
   const [startedAt, setStartedAt] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [categorizationLoading, setCategorizationLoading] = useState(false);
+
+  // Auto-categorize using AI
+  const handleAutoCategorize = async () => {
+    if (!title.trim()) return;
+    setCategorizationLoading(true);
+
+    try {
+      const { buildCategorizationPrompt } = await import('@/lib/ollama');
+      const prompt = buildCategorizationPrompt(title, description);
+
+      const response = await fetch('/api/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, type: 'categorize' }),
+      });
+
+      if (!response.ok) throw new Error('Failed to categorize');
+
+      const data = await response.json();
+      const text = data.suggestion || '';
+
+      // Parse the structured response
+      const stageMatch = text.match(/STAGE:\s*(\w+)/i);
+      const typeMatch = text.match(/TYPE:\s*(\w+)/i);
+      const tagsMatch = text.match(/TAGS:\s*([^\n]+)/i);
+      const effortMatch = text.match(/EFFORT:\s*(\w+)/i);
+
+      if (stageMatch && stages.includes(stageMatch[1] as Stage)) {
+        setStage(stageMatch[1] as Stage);
+      }
+      if (typeMatch && types.includes(typeMatch[1] as IdeaType)) {
+        setType(typeMatch[1] as IdeaType);
+      }
+      if (tagsMatch) {
+        setTags(tagsMatch[1].trim());
+      }
+      if (effortMatch && efforts.includes(effortMatch[1] as Effort)) {
+        setEffort(effortMatch[1] as Effort);
+      }
+    } catch (error) {
+      console.error('Auto-categorization failed:', error);
+    } finally {
+      setCategorizationLoading(false);
+    }
+  };
 
   // Get today's date in PST/California timezone
   const getTodayPST = () => {
@@ -174,6 +220,28 @@ export function IdeaModal({
               className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all resize-none placeholder:text-[var(--muted)]"
             />
           </div>
+
+          {/* Auto-categorize button - only for new ideas */}
+          {!idea && title.trim() && (
+            <button
+              type="button"
+              onClick={handleAutoCategorize}
+              disabled={categorizationLoading}
+              className="flex items-center gap-2 text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {categorizationLoading ? (
+                <>
+                  <Sparkles className="w-4 h-4 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Auto-categorize with AI
+                </>
+              )}
+            </button>
+          )}
 
           {/* Stage Selection - Visual Buttons with Tooltips */}
           <div>

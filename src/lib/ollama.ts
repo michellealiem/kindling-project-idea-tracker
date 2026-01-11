@@ -143,3 +143,90 @@ ${themeSummary || '(no themes imported)'}
 
 In 1-2 sentences, identify which theme(s) this project relates to and why. Be specific about the connection.`;
 }
+
+// Auto-categorization prompt for new ideas
+export function buildCategorizationPrompt(title: string, description: string): string {
+  return `You are helping categorize a new project idea.
+
+Title: ${title}
+Description: ${description || '(no description yet)'}
+
+Based on this, suggest the following. Be concise and direct:
+
+1. **Stage**: Which stage should this start in?
+   - spark: Just an idea, needs more thinking
+   - exploring: Ready to research/validate
+   - building: Ready to build now
+   - shipped: Already complete (rare for new ideas)
+   - paused: On hold for now
+
+2. **Type**: What kind of project is this?
+   - permasolution: Build once, runs forever with no maintenance
+   - project: Requires ongoing work/maintenance
+   - experiment: Quick test or prototype
+   - learning: Knowledge or skill acquisition
+
+3. **Tags**: Suggest 2-4 relevant tags (comma-separated, lowercase)
+
+4. **Effort**: Estimate the effort level
+   - trivial: < 1 hour
+   - small: 1-4 hours
+   - medium: 1-2 days
+   - large: 1 week+
+   - epic: Multi-week
+
+Respond in EXACTLY this format (one line each):
+STAGE: [stage]
+TYPE: [type]
+TAGS: [tag1, tag2, tag3]
+EFFORT: [effort]
+REASONING: [1 sentence explaining your choices]`;
+}
+
+// Dashboard insights prompt for portfolio analysis
+export function buildDashboardInsightsPrompt(
+  ideas: { title: string; type: string; stage: string; tags: string[] }[],
+  themes: { title: string; description: string }[]
+): string {
+  // Group by stage
+  const stageGroups: Record<string, string[]> = {};
+  ideas.forEach((i) => {
+    if (!stageGroups[i.stage]) stageGroups[i.stage] = [];
+    stageGroups[i.stage].push(i.title);
+  });
+
+  const stageSummary = Object.entries(stageGroups)
+    .map(
+      ([stage, titles]) =>
+        `- ${stage}: ${titles.length} (${titles.slice(0, 2).join(', ')}${titles.length > 2 ? '...' : ''})`
+    )
+    .join('\n');
+
+  const permasolutions = ideas.filter((i) => i.type === 'permasolution').length;
+  const needsMaintenance = ideas.filter((i) => i.type === 'project').length;
+
+  const themeSummary =
+    themes
+      .slice(0, 3)
+      .map((t) => `- ${t.title}`)
+      .join('\n') || '(no themes)';
+
+  return `You are helping a builder understand patterns in their project portfolio.
+
+Portfolio breakdown:
+${stageSummary}
+
+Total: ${ideas.length} ideas
+- Permasolutions (no maintenance): ${permasolutions}
+- Projects (needs maintenance): ${needsMaintenance}
+
+Recurring themes:
+${themeSummary}
+
+Provide a brief analysis (2-3 short paragraphs) that:
+1. Identifies any patterns worth noting (too many ideas stuck in one stage? not enough permasolutions?)
+2. Suggests what to focus on next
+3. Offers one actionable recommendation
+
+This builder prefers "permasolutions" that don't need ongoing maintenance. Be direct and practical.`;
+}

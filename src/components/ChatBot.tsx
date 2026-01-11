@@ -162,7 +162,7 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
             </div>
             <div>
               <h3 className="font-semibold text-[var(--foreground)]">Kindling Companion</h3>
-              <p className="text-xs text-[var(--muted)]">Ask me about your ideas & insights</p>
+              <p className="text-xs text-[var(--muted)]">Llama 3.1 via Ollama</p>
             </div>
           </div>
           <button

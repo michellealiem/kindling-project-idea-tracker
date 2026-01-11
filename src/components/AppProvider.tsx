@@ -203,7 +203,6 @@ export function AppProvider({ children }: AppProviderProps) {
         <Sidebar
           stats={stats}
           onExport={exportToFile}
-          onImportClick={() => setImportModalOpen(true)}
         />
 
         <main className="flex-1 pb-20 lg:pb-0">{children}</main>

@@ -6,10 +6,12 @@ import {
   DragEndEvent,
   DragStartEvent,
   DragOverlay,
-  closestCenter,
+  pointerWithin,
+  rectIntersection,
   PointerSensor,
   useSensor,
   useSensors,
+  CollisionDetection,
 } from '@dnd-kit/core';
 import { useApp } from '@/components/AppProvider';
 import { DroppableColumn } from '@/components/DroppableColumn';
@@ -19,6 +21,30 @@ import { Stage } from '@/lib/types';
 import { Flame } from 'lucide-react';
 
 const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
+
+// Custom collision detection that prioritizes column drops
+// Uses pointerWithin first (more forgiving), falls back to rectIntersection
+const customCollisionDetection: CollisionDetection = (args) => {
+  // First try pointerWithin (checks if pointer is within droppable)
+  const pointerCollisions = pointerWithin(args);
+
+  // Filter to only include stage columns (not cards)
+  const columnCollisions = pointerCollisions.filter(
+    collision => stages.includes(collision.id as Stage)
+  );
+
+  if (columnCollisions.length > 0) {
+    return columnCollisions;
+  }
+
+  // Fall back to rect intersection with all droppables
+  const rectCollisions = rectIntersection(args);
+  const columnRectCollisions = rectCollisions.filter(
+    collision => stages.includes(collision.id as Stage)
+  );
+
+  return columnRectCollisions.length > 0 ? columnRectCollisions : rectCollisions;
+};
 
 export default function KanbanPage() {
   const {
@@ -101,7 +127,7 @@ export default function KanbanPage() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={customCollisionDetection}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
