@@ -118,7 +118,7 @@ export default function KanbanPage() {
       <div className="flex items-center justify-center h-screen bg-[var(--background)]">
         <div className="flex flex-col items-center gap-4">
           <Flame className="w-12 h-12 text-[var(--primary)] animate-pulse" />
-          <span className="text-[var(--muted)] font-medium">Stoking the fire...</span>
+          <span className="text-[var(--muted-foreground)] font-medium">Stoking the fire...</span>
         </div>
       </div>
     );
@@ -138,7 +138,7 @@ export default function KanbanPage() {
             <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
               Kanban Board
             </h1>
-            <p className="text-[var(--muted)]">
+            <p className="text-[var(--muted-foreground)]">
               {isSearchActive
                 ? `Showing ${filteredIdeas.length} filtered ideas`
                 : 'Drag cards to move between stages'}

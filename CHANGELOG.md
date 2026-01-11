@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-K] - Timeline Delete & UI Polish
+
+### Added
+- **Timeline Entry Deletion**: Hover over any timeline entry to reveal an X button for removal
+  - Helps manage clutter from overtracking stage changes
+  - Confirms before deletion, prevents removing the last entry
+  - Removes specific stage history entries without affecting the idea itself
+
+### Fixed
+- **ChatBot Error Handling**: More specific error messages when Ollama connection fails
+- **CSS Color Consistency**: Updated `--muted` to `--muted-foreground` across all pages for better text visibility
+  - Dashboard, Kanban, Timeline, Insights pages
+  - StatsCard and DroppableColumn components
+
+### Files Modified
+- `src/app/timeline/page.tsx` - Delete functionality for timeline entries
+- `src/app/page.tsx` - Color consistency fixes
+- `src/app/kanban/page.tsx` - Color consistency fixes
+- `src/app/insights/page.tsx` - Color consistency fixes
+- `src/components/ChatBot.tsx` - Improved error handling
+- `src/components/StatsCard.tsx` - Color consistency fix
+- `src/components/DroppableColumn.tsx` - Color consistency fix
+
+---
+
 ## [2026-01-11-J] - Security Hardening (High Priority)
 
 ### Added

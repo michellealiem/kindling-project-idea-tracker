@@ -78,7 +78,7 @@ export function StatsCard({ label, value, icon, stage, onClick }: StatsCardProps
           <p className="text-3xl font-bold text-[var(--foreground)] tabular-nums">
             {value}
           </p>
-          <p className="text-sm text-[var(--muted)]">{label}</p>
+          <p className="text-sm text-[var(--muted-foreground)]">{label}</p>
         </div>
       </div>
     </Wrapper>

@@ -49,7 +49,7 @@ export function DroppableColumn({
           </div>
           <h2 className="font-semibold text-[var(--foreground)]">{config.label}</h2>
         </div>
-        <span className="px-2.5 py-1 bg-[var(--border)] rounded-full text-sm font-medium text-[var(--muted)] tabular-nums">
+        <span className="px-2.5 py-1 bg-[var(--border)] rounded-full text-sm font-medium text-[var(--muted-foreground)] tabular-nums">
           {ideas.length}
         </span>
       </div>
@@ -68,7 +68,7 @@ export function DroppableColumn({
               >
                 <span className={`${config.color} opacity-50`}>{stageIcons[stage]}</span>
               </div>
-              <p className="text-sm text-[var(--muted)]">
+              <p className="text-sm text-[var(--muted-foreground)]">
                 {isOver ? 'Drop here' : 'No ideas here'}
               </p>
               {stage === 'spark' && !isOver && (

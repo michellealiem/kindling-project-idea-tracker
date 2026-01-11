@@ -11,7 +11,7 @@ export default function InsightsPage() {
       <div className="flex items-center justify-center h-screen bg-[var(--background)]">
         <div className="flex flex-col items-center gap-4">
           <Flame className="w-12 h-12 text-[var(--primary)] animate-pulse" />
-          <span className="text-[var(--muted)] font-medium">Loading insights...</span>
+          <span className="text-[var(--muted-foreground)] font-medium">Loading insights...</span>
         </div>
       </div>
     );
@@ -35,7 +35,7 @@ export default function InsightsPage() {
         <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
           Insights
         </h1>
-        <p className="text-[var(--muted)]">
+        <p className="text-[var(--muted-foreground)]">
           Themes, learnings, and patterns from your journey
         </p>
       </div>
@@ -62,10 +62,10 @@ export default function InsightsPage() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--exploring-bg)] flex items-center justify-center">
                 <BookOpen className="w-8 h-8 text-[var(--exploring)] opacity-50" />
               </div>
-              <p className="text-[var(--muted)] mb-2">
+              <p className="text-[var(--muted-foreground)] mb-2">
                 No themes imported yet
               </p>
-              <p className="text-sm text-[var(--muted)] opacity-70">
+              <p className="text-sm text-[var(--muted-foreground)] opacity-70">
                 Import your PAIA themes from the sidebar
               </p>
             </div>
@@ -86,15 +86,15 @@ export default function InsightsPage() {
                       {theme.occurrences}x
                     </span>
                   </div>
-                  <p className="text-sm text-[var(--muted)] line-clamp-3">
+                  <p className="text-sm text-[var(--muted-foreground)] line-clamp-3">
                     {theme.description}
                   </p>
                   {theme.keyMoments.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-[var(--border)]">
-                      <p className="text-xs text-[var(--muted)] mb-2">
+                      <p className="text-xs text-[var(--muted-foreground)] mb-2">
                         Key moments:
                       </p>
-                      <ul className="text-xs text-[var(--muted)] space-y-1">
+                      <ul className="text-xs text-[var(--muted-foreground)] space-y-1">
                         {theme.keyMoments.slice(0, 2).map((moment, idx) => (
                           <li key={idx} className="line-clamp-1 italic">
                             &ldquo;{moment}&rdquo;
@@ -130,10 +130,10 @@ export default function InsightsPage() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--spark-bg)] flex items-center justify-center">
                 <Lightbulb className="w-8 h-8 text-[var(--spark)] opacity-50" />
               </div>
-              <p className="text-[var(--muted)] mb-2">
+              <p className="text-[var(--muted-foreground)] mb-2">
                 No learnings imported yet
               </p>
-              <p className="text-sm text-[var(--muted)] opacity-70">
+              <p className="text-sm text-[var(--muted-foreground)] opacity-70">
                 Import your PAIA learnings from the sidebar
               </p>
             </div>
@@ -146,8 +146,8 @@ export default function InsightsPage() {
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div className="flex items-start gap-2 mb-2">
-                    <Calendar className="w-4 h-4 text-[var(--muted)] mt-0.5" />
-                    <span className="text-xs text-[var(--muted)]">
+                    <Calendar className="w-4 h-4 text-[var(--muted-foreground)] mt-0.5" />
+                    <span className="text-xs text-[var(--muted-foreground)]">
                       {learning.date}
                     </span>
                   </div>
@@ -155,12 +155,12 @@ export default function InsightsPage() {
                     {learning.title}
                   </h3>
                   {learning.context && (
-                    <p className="text-sm text-[var(--muted)] mb-2 line-clamp-2">
+                    <p className="text-sm text-[var(--muted-foreground)] mb-2 line-clamp-2">
                       <span className="font-medium">Context:</span> {learning.context}
                     </p>
                   )}
                   {learning.discovery && (
-                    <p className="text-sm text-[var(--muted)] line-clamp-3">
+                    <p className="text-sm text-[var(--muted-foreground)] line-clamp-3">
                       {learning.discovery}
                     </p>
                   )}
@@ -194,7 +194,7 @@ export default function InsightsPage() {
               <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[var(--primary)]/10 flex items-center justify-center">
                 <Tag className="w-7 h-7 text-[var(--primary)] opacity-50" />
               </div>
-              <p className="text-[var(--muted)]">
+              <p className="text-[var(--muted-foreground)]">
                 No tags yet. Add tags to your ideas to see patterns.
               </p>
             </div>

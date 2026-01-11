@@ -3,18 +3,44 @@
 import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { Stage, STAGE_CONFIG } from '@/lib/types';
-import { Zap, Flame, Lightbulb, CircleDot, Calendar, Crown, Clock, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Zap, Flame, Lightbulb, CircleDot, Calendar, Crown, Clock, Search, ChevronDown, ChevronRight, X } from 'lucide-react';
 
 export default function TimelinePage() {
-  const { ideas, isLoading, openEditIdeaModal } = useApp();
+  const { ideas, isLoading, openEditIdeaModal, updateIdea } = useApp();
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+
+  // Delete a specific stage history entry from an idea
+  const handleDeleteEntry = (ideaId: string, stageToDelete: Stage, dateToDelete: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Don't open the edit modal
+
+    const idea = ideas.find(i => i.id === ideaId);
+    if (!idea) return;
+
+    // Find and remove the specific entry
+    const updatedHistory = idea.stageHistory.filter(
+      entry => !(entry.stage === stageToDelete && entry.date === dateToDelete)
+    );
+
+    // Don't allow deleting the last entry - every idea needs at least one stage
+    if (updatedHistory.length === 0) {
+      alert('Cannot delete the last timeline entry. Every idea needs at least one stage.');
+      return;
+    }
+
+    // Confirm deletion
+    if (!confirm(`Remove "${idea.title}" from timeline for "${STAGE_CONFIG[stageToDelete].label}"?`)) {
+      return;
+    }
+
+    updateIdea(idea.id, { stageHistory: updatedHistory });
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-[var(--background)]">
         <div className="flex flex-col items-center gap-4">
           <Flame className="w-12 h-12 text-[var(--primary)] animate-pulse" />
-          <span className="text-[var(--muted)] font-medium">Tracing the flames...</span>
+          <span className="text-[var(--muted-foreground)] font-medium">Tracing the flames...</span>
         </div>
       </div>
     );
@@ -39,6 +65,7 @@ export default function TimelinePage() {
             idea,
             stage: entry.stage,
             date: new Date(useStartedAt ? idea.startedAt! : entry.date),
+            originalDate: entry.date, // Keep original date string for deletion
             isBackdated: useStartedAt ? true : false,
           };
         })
@@ -106,7 +133,7 @@ export default function TimelinePage() {
         <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
           Timeline
         </h1>
-        <p className="text-[var(--muted)]">
+        <p className="text-[var(--muted-foreground)]">
           Watch your ideas catch fire
         </p>
       </div>
@@ -119,7 +146,7 @@ export default function TimelinePage() {
           <h2 className="text-xl font-semibold text-[var(--foreground)] mb-2">
             No timeline yet
           </h2>
-          <p className="text-[var(--muted)]">
+          <p className="text-[var(--muted-foreground)]">
             Strike your first spark to start the fire
           </p>
         </div>
@@ -201,18 +228,27 @@ export default function TimelinePage() {
                               </div>
 
                               {/* Action description */}
-                              <p className={`text-sm ${isShipped ? 'text-[var(--shipped)] font-medium' : 'text-[var(--muted)]'}`}>
+                              <p className={`text-sm ${isShipped ? 'text-[var(--shipped)] font-medium' : 'text-[var(--muted-foreground)]'}`}>
                                 {stageDescriptions[event.stage]}
                               </p>
 
                               {/* Time */}
-                              <p className="text-xs text-[var(--muted)] mt-1 opacity-70">
+                              <p className="text-xs text-[var(--muted-foreground)] mt-1 opacity-70">
                                 {event.date.toLocaleTimeString('en-US', {
                                   hour: 'numeric',
                                   minute: '2-digit',
                                 })}
                               </p>
                             </div>
+
+                            {/* Delete button */}
+                            <button
+                              onClick={(e) => handleDeleteEntry(event.idea.id, event.stage, event.originalDate, e)}
+                              className="p-1.5 rounded-lg text-[var(--muted)] hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                              title="Remove from timeline"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
                         </button>
                       );

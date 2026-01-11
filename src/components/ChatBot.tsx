@@ -92,11 +92,11 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Chat request failed');
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.details || data.error || 'Chat request failed');
+      }
 
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
@@ -108,11 +108,13 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Chat error:', error);
+      const errorContent = error instanceof Error && error.message.includes('Ollama')
+        ? error.message
+        : "Hmm, I couldn't connect to my brain (Ollama). Make sure it's running with `ollama serve` on your Mac.";
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
         role: 'assistant',
-        content:
-          "Hmm, I couldn't connect to my brain (Ollama). Make sure it's running with `ollama serve` on your Mac.",
+        content: errorContent,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -151,7 +153,7 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
           sm:rounded-2xl shadow-2xl
           flex flex-col
           transition-all duration-300 ease-out
-          ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full sm:translate-y-8 opacity-0 pointer-events-none'}
+          ${isOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full sm:translate-y-8 opacity-0 pointer-events-none'}
         `}
       >
         {/* Header */}

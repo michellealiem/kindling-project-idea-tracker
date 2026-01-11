@@ -73,7 +73,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-screen bg-[var(--background)]">
         <div className="flex flex-col items-center gap-4">
           <Flame className="w-12 h-12 text-[var(--primary)] animate-pulse" />
-          <span className="text-[var(--muted)] font-medium">Stoking the fire...</span>
+          <span className="text-[var(--muted-foreground)] font-medium">Stoking the fire...</span>
         </div>
       </div>
     );
@@ -93,7 +93,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
             Dashboard
           </h1>
-          <p className="text-[var(--muted)]">
+          <p className="text-[var(--muted-foreground)]">
             {isSearchActive
               ? `${filteredIdeas.length} ${filteredIdeas.length === 1 ? 'result' : 'results'}`
               : 'Overview of all your ideas and projects'}
@@ -151,12 +151,12 @@ export default function DashboardPage() {
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--waiting-bg)] text-xs">
               <Clock className="w-3 h-3 text-[var(--waiting)]" />
               <span className="font-medium text-[var(--waiting)]">{stats?.byStage.waiting ?? 0}</span>
-              <span className="text-[var(--muted)]">waiting</span>
+              <span className="text-[var(--muted-foreground)]">waiting</span>
             </div>
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--simmering-bg)] text-xs">
               <Flame className="w-3 h-3 text-[var(--simmering)] opacity-60" />
               <span className="font-medium text-[var(--simmering)]">{stats?.byStage.simmering ?? 0}</span>
-              <span className="text-[var(--muted)]">simmering</span>
+              <span className="text-[var(--muted-foreground)]">simmering</span>
             </div>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
               {insights}
             </div>
           ) : (
-            <p className="text-[var(--muted)] text-sm">
+            <p className="text-[var(--muted-foreground)] text-sm">
               Click &quot;Analyze Portfolio&quot; to get AI-powered insights about your ideas and projects.
             </p>
           )}
@@ -266,7 +266,7 @@ export default function DashboardPage() {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--building-bg)] flex items-center justify-center">
                   <Flame className="w-8 h-8 text-[var(--building)] opacity-50" />
                 </div>
-                <p className="text-[var(--muted)] mb-4">
+                <p className="text-[var(--muted-foreground)] mb-4">
                   No active projects yet
                 </p>
                 <button
@@ -300,7 +300,7 @@ export default function DashboardPage() {
                       <Clock className="w-4 h-4 text-[var(--waiting)]" />
                     </div>
                     <h3 className="font-medium text-[var(--foreground)]">Waiting</h3>
-                    <span className="text-xs text-[var(--muted)]">({waitingIdeas.length})</span>
+                    <span className="text-xs text-[var(--muted-foreground)]">({waitingIdeas.length})</span>
                   </div>
                   <div className="space-y-2">
                     {waitingIdeas.slice(0, 3).map((idea) => (
@@ -323,7 +323,7 @@ export default function DashboardPage() {
                       <Flame className="w-4 h-4 text-[var(--simmering)] opacity-60" />
                     </div>
                     <h3 className="font-medium text-[var(--foreground)]">Simmering</h3>
-                    <span className="text-xs text-[var(--muted)]">({simmeringIdeas.length})</span>
+                    <span className="text-xs text-[var(--muted-foreground)]">({simmeringIdeas.length})</span>
                   </div>
                   <div className="space-y-2">
                     {simmeringIdeas.slice(0, 3).map((idea) => (
@@ -358,7 +358,7 @@ export default function DashboardPage() {
                 <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[var(--spark-bg)] flex items-center justify-center">
                   <Zap className="w-7 h-7 text-[var(--spark)] opacity-50" />
                 </div>
-                <p className="text-sm text-[var(--muted)]">
+                <p className="text-sm text-[var(--muted-foreground)]">
                   No ideas yet. Capture your first!
                 </p>
               </div>
@@ -392,7 +392,7 @@ export default function DashboardPage() {
                 <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[var(--shipped-bg)] flex items-center justify-center">
                   <Lightbulb className="w-7 h-7 text-[var(--shipped)] opacity-50" />
                 </div>
-                <p className="text-sm text-[var(--muted)]">
+                <p className="text-sm text-[var(--muted-foreground)]">
                   Ship your first project!
                 </p>
               </div>
@@ -421,7 +421,7 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">
             Welcome to Kindling
           </h2>
-          <p className="text-[var(--muted)] mb-6 max-w-md mx-auto">
+          <p className="text-[var(--muted-foreground)] mb-6 max-w-md mx-auto">
             Where ideas catch fire. Nurture sparks into blazing beacons.
           </p>
           <button
