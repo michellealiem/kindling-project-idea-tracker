@@ -15,6 +15,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Removes specific stage history entries without affecting the idea itself
 
 ### Fixed
+- **ChatBot Dark Mode Visibility**: Fixed nearly invisible UI elements in dark mode
+  - X close button now uses `text-gray-400` (was too dark with CSS variable)
+  - "Llama 3.1 via Ollama" subheader text lightened
+  - Message timestamps lightened
+  - "Thinking..." loading indicator lightened
+  - Input placeholder text lightened
+- **ChatBot Close Button**: Added `pointer-events-auto` to ensure clicks register
 - **ChatBot Error Handling**: More specific error messages when Ollama connection fails
 - **CSS Color Consistency**: Updated `--muted` to `--muted-foreground` across all pages for better text visibility
   - Dashboard, Kanban, Timeline, Insights pages
@@ -25,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `src/app/page.tsx` - Color consistency fixes
 - `src/app/kanban/page.tsx` - Color consistency fixes
 - `src/app/insights/page.tsx` - Color consistency fixes
-- `src/components/ChatBot.tsx` - Improved error handling
+- `src/components/ChatBot.tsx` - Dark mode fixes, close button fix, improved error handling
 - `src/components/StatsCard.tsx` - Color consistency fix
 - `src/components/DroppableColumn.tsx` - Color consistency fix
 

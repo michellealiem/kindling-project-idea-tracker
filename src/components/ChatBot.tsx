@@ -164,12 +164,12 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
             </div>
             <div>
               <h3 className="font-semibold text-[var(--foreground)]">Kindling Companion</h3>
-              <p className="text-xs text-[var(--muted)]">Llama 3.1 via Ollama</p>
+              <p className="text-xs text-gray-400">Llama 3.1 via Ollama</p>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--background)] rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-white hover:bg-[var(--background)] rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -195,7 +195,7 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 <p
                   className={`text-xs mt-1 ${
-                    message.role === 'user' ? 'text-white/60' : 'text-[var(--muted)]'
+                    message.role === 'user' ? 'text-white/60' : 'text-gray-400'
                   }`}
                 >
                   {message.timestamp.toLocaleTimeString('en-US', {
@@ -210,7 +210,7 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
           {isLoading && (
             <div className="flex justify-start">
               <div className="bg-[var(--background)] border border-[var(--border)] px-4 py-3 rounded-2xl rounded-bl-md">
-                <div className="flex items-center gap-2 text-[var(--muted)]">
+                <div className="flex items-center gap-2 text-gray-400">
                   <Flame className="w-4 h-4 animate-pulse text-[var(--spark)]" />
                   <span className="text-sm">Thinking...</span>
                 </div>
@@ -231,7 +231,7 @@ export function ChatBot({ ideas, themes, learnings }: ChatBotProps) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about your ideas, themes, learnings..."
               disabled={isLoading}
-              className="flex-1 px-4 py-3 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all placeholder:text-[var(--muted)] disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all placeholder:text-gray-400 disabled:opacity-50"
             />
             <button
               type="submit"
