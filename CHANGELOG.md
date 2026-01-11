@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [2026-01-11-F] - Google Sheets Sync Fix
+## [2026-01-11-G] - Google Sheets Sync Fix (Complete)
 
 ### Fixed
+
+**Private Key Parsing:**
+- Fixed Netlify environment variable handling for Google service account private key
+- Added robust `parsePrivateKey()` function with multiple parsing strategies
+- Handles quoted keys, literal `\n` sequences, and JSON-encoded strings
+- Root cause: Key was being truncated when pasted with real newlines; solution is to paste the entire key including surrounding double quotes
 
 **API Route Error Handling:**
 - Added `isGoogleSheetsConfigured()` check to all API routes
@@ -17,16 +23,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - App gracefully falls back to localStorage when API returns 503
 
 **Netlify Configuration:**
-- Simplified `netlify.toml` - removed explicit plugin declaration
-- Netlify's OpenNext adapter now handles Next.js automatically
+- Restored explicit `@netlify/plugin-nextjs` plugin declaration
 - Set Node.js version to 20 for build environment
 
+### Added
+
+**Bulk Sync Endpoint:**
+- Added `/api/sync` POST endpoint for one-time localStorage to Sheets migration
+- Added `bulkSyncIdeas()` function to google-sheets.ts
+- Skips ideas that already exist (by ID), creates new ones
+
 ### Files Modified
-- `src/lib/google-sheets.ts` - Added `isGoogleSheetsConfigured()` export
+- `src/lib/google-sheets.ts` - Added `parsePrivateKey()`, `isGoogleSheetsConfigured()`, `bulkSyncIdeas()`
 - `src/app/api/data/route.ts` - Added config check with detailed error response
 - `src/app/api/ideas/route.ts` - Added config check to GET and POST
 - `src/app/api/ideas/[id]/route.ts` - Added config check to GET, PATCH, DELETE
-- `netlify.toml` - Simplified configuration for OpenNext adapter
+- `src/app/api/sync/route.ts` - New bulk sync endpoint
+- `netlify.toml` - Restored plugin declaration
 
 ---
 
@@ -345,4 +358,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11F
+**Last Updated:** 2026-01-11G
