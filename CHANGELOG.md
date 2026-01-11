@@ -6,6 +6,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-J] - Security Hardening (High Priority)
+
+### Added
+
+**Zod Input Validation:**
+- All API endpoints now validate input with Zod schemas
+- `/api/ideas` POST validates title (1-200 chars), description (max 5K), stage, type, effort enums
+- `/api/ideas/[id]` PATCH validates partial updates with strict schema (rejects unknown fields)
+- `/api/sync` validates bulk idea array (max 1000 ideas) with full schema
+- `/api/suggest` validates prompt (max 10K chars)
+- `/api/chat` validates message (max 5K chars) and context arrays
+
+**SSRF Protection:**
+- Ollama endpoints (`/api/suggest`, `/api/chat`) now validate `OLLAMA_HOST`
+- Only localhost connections allowed (127.0.0.1, localhost, ::1)
+- Blocks internal network scanning via malicious environment variables
+
+**Rate Limiting:**
+- Created reusable rate limiter (`src/lib/rate-limit.ts`)
+- AI endpoints limited to 20 requests/minute per IP
+- Returns 429 with Retry-After header when exceeded
+
+### Files Created
+- `src/lib/rate-limit.ts` - In-memory rate limiting utility
+
+### Files Modified
+- `src/app/api/ideas/route.ts` - Zod validation for POST
+- `src/app/api/ideas/[id]/route.ts` - Zod validation for PATCH
+- `src/app/api/sync/route.ts` - Zod validation with full idea schema
+- `src/app/api/suggest/route.ts` - SSRF protection, input validation, rate limiting
+- `src/app/api/chat/route.ts` - SSRF protection, input validation, rate limiting
+
+---
+
 ## [2026-01-11-I] - Security Hardening (Medium Priority)
 
 ### Added
@@ -419,4 +453,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11I
+**Last Updated:** 2026-01-11J

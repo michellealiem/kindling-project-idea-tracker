@@ -1,7 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { checkRateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 
-const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.1:8b';
+
+// SSRF protection: validate Ollama host URL
+function getValidatedOllamaHost(): string {
+  const host = process.env.OLLAMA_HOST || 'http://localhost:11434';
+
+  try {
+    const url = new URL(host);
+    const hostname = url.hostname.toLowerCase();
+
+    // Only allow localhost connections for Ollama (SSRF protection)
+    const allowedHosts = ['localhost', '127.0.0.1', '::1'];
+    if (!allowedHosts.includes(hostname)) {
+      console.warn(`SSRF protection: Blocked non-localhost Ollama host: ${hostname}`);
+      return 'http://localhost:11434';
+    }
+
+    return host;
+  } catch {
+    return 'http://localhost:11434';
+  }
+}
+
+const OLLAMA_HOST = getValidatedOllamaHost();
+
+// Input validation schemas
+const IdeaContextSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  stage: z.string(),
+  type: z.string(),
+  tags: z.array(z.string()),
+  notes: z.string(),
+});
+
+const ChatContextSchema = z.object({
+  ideas: z.array(IdeaContextSchema).max(500),
+  themes: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string(),
+  })).max(100),
+  learnings: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    context: z.string(),
+    discovery: z.string(),
+  })).max(100),
+}).optional();
+
+const ChatRequestSchema = z.object({
+  message: z.string().min(1, 'Message is required').max(5000, 'Message too long'),
+  context: ChatContextSchema,
+});
 
 interface ChatContext {
   ideas: Array<{
@@ -68,16 +123,29 @@ function buildSystemPrompt(context: ChatContext): string {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const { message, context } = await request.json();
+  // Rate limiting
+  const clientIP = getClientIP(request);
+  const rateLimit = checkRateLimit(`chat:${clientIP}`, RATE_LIMITS.ai);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) } }
+    );
+  }
 
-    if (!message) {
+  try {
+    const body = await request.json();
+
+    // Validate input
+    const parseResult = ChatRequestSchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'Message is required' },
+        { error: 'Invalid input', details: parseResult.error.issues.map(i => i.message).join(', ') },
         { status: 400 }
       );
     }
 
+    const { message, context } = parseResult.data;
     const systemPrompt = buildSystemPrompt(context || { ideas: [], themes: [], learnings: [] });
     const fullPrompt = systemPrompt + '\n\nUser: ' + message + '\n\nAssistant:';
 

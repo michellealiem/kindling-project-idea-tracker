@@ -1,7 +1,24 @@
 // API routes for Ideas CRUD operations
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getAllIdeas, createIdea as createIdeaInSheet, isGoogleSheetsConfigured } from '@/lib/google-sheets';
-import { Idea, Stage, IdeaType, Effort } from '@/lib/types';
+import { Idea } from '@/lib/types';
+
+// Zod schemas for input validation
+const StageSchema = z.enum(['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused']);
+const IdeaTypeSchema = z.enum(['permasolution', 'project', 'experiment', 'learning']);
+const EffortSchema = z.enum(['trivial', 'small', 'medium', 'large', 'epic']);
+
+const CreateIdeaSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
+  description: z.string().max(5000, 'Description too long').optional().default(''),
+  stage: StageSchema.optional().default('spark'),
+  type: IdeaTypeSchema.optional().default('experiment'),
+  tags: z.array(z.string().max(50)).max(20, 'Too many tags').optional().default([]),
+  effort: EffortSchema.optional().default('medium'),
+  notes: z.string().max(10000, 'Notes too long').optional().default(''),
+  startedAt: z.string().optional(),
+});
 
 // GET /api/ideas - Get all ideas
 export async function GET() {
@@ -36,19 +53,30 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Validate input
+    const parseResult = CreateIdeaSchema.safeParse(body);
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parseResult.error.issues.map(i => i.message).join(', ') },
+        { status: 400 }
+      );
+    }
+
+    const validated = parseResult.data;
     const now = new Date().toISOString();
     const newIdea: Idea = {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      title: body.title,
-      description: body.description || '',
-      stage: body.stage as Stage || 'spark',
-      type: body.type as IdeaType || 'experiment',
-      tags: body.tags || [],
-      effort: body.effort as Effort || 'medium',
-      notes: body.notes || '',
+      title: validated.title,
+      description: validated.description,
+      stage: validated.stage,
+      type: validated.type,
+      tags: validated.tags,
+      effort: validated.effort,
+      notes: validated.notes,
       createdAt: now,
       updatedAt: now,
-      stageHistory: [{ stage: body.stage || 'spark', date: now }],
+      startedAt: validated.startedAt,
+      stageHistory: [{ stage: validated.stage, date: now }],
     };
 
     const created = await createIdeaInSheet(newIdea);
