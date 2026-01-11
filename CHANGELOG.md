@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-A] - Google Sheets Integration
+
+### Added
+
+**Cloud Sync via Google Sheets:**
+- Ideas now sync to Google Sheets for cross-device access (laptop, desktop, phone)
+- Real-time CRUD operations through API routes
+- Automatic localStorage fallback for offline support
+- Service account authentication for secure server-to-server access
+
+**API Routes:**
+- `GET/POST /api/ideas` - List and create ideas
+- `GET/PATCH/DELETE /api/ideas/[id]` - Single idea operations
+- `GET/POST /api/data` - Full data sync and sheet initialization
+
+### Fixed
+- Dark mode gray text contrast improved (#9c958b → #b8b0a5) for better readability
+
+### Files Created
+- `src/lib/google-sheets.ts` - Google Sheets storage adapter
+- `src/app/api/ideas/route.ts` - Ideas collection API
+- `src/app/api/ideas/[id]/route.ts` - Single idea API
+- `src/app/api/data/route.ts` - Data sync API
+
+### Files Modified
+- `src/hooks/useIdeas.ts` - Added API calls with localStorage fallback
+- `src/app/globals.css` - Fixed muted-foreground color in dark mode
+- `package.json` - Added google-spreadsheet and googleapis packages
+
+### Configuration
+- Requires Google Cloud service account credentials in environment variables
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_SHEET_ID`
+
+---
+
 ## [2026-01-10-E] - Mouse Sparks & Password Protection
 
 ### Added
@@ -176,4 +211,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-10E
+**Last Updated:** 2026-01-11A
