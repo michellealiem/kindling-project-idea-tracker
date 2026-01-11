@@ -32,7 +32,7 @@ function rowToIdea(row: GoogleSpreadsheetRow<Record<string, string>>): Idea {
 
   // Parse stageHistory from "stage1|date1;stage2|date2" format
   const stageHistory = stageHistoryStr
-    ? stageHistoryStr.split(';').filter(Boolean).map(entry => {
+    ? stageHistoryStr.split(';').filter(Boolean).map((entry: string) => {
         const [stage, date] = entry.split('|');
         return { stage: stage as Stage, date };
       })
