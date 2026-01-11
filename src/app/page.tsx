@@ -3,6 +3,7 @@
 import { useApp } from '@/components/AppProvider';
 import { StatsCard } from '@/components/StatsCard';
 import { IdeaCard } from '@/components/IdeaCard';
+import { SearchBar } from '@/components/SearchBar';
 import {
   Zap,
   Flame,
@@ -19,6 +20,13 @@ export default function DashboardPage() {
     getRecentIdeas,
     openNewIdeaModal,
     openEditIdeaModal,
+    searchQuery,
+    setSearchQuery,
+    searchFilters,
+    setSearchFilters,
+    allTags,
+    filteredIdeas,
+    isSearchActive,
   } = useApp();
 
   if (isLoading) {
@@ -39,22 +47,35 @@ export default function DashboardPage() {
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto animate-fade-up">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
             Dashboard
           </h1>
           <p className="text-[var(--muted)]">
-            Overview of all your ideas and projects
+            {isSearchActive
+              ? `${filteredIdeas.length} ${filteredIdeas.length === 1 ? 'result' : 'results'}`
+              : 'Overview of all your ideas and projects'}
           </p>
         </div>
-        <button
-          onClick={openNewIdeaModal}
-          className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[var(--primary)]/20"
-        >
-          <Plus className="w-5 h-5" />
-          New Idea
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="flex-1 sm:w-64 lg:w-80">
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              filters={searchFilters}
+              onFiltersChange={setSearchFilters}
+              allTags={allTags}
+            />
+          </div>
+          <button
+            onClick={openNewIdeaModal}
+            className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[var(--primary)]/20"
+          >
+            <Plus className="w-5 h-5" />
+            New Idea
+          </button>
+        </div>
       </div>
 
       {/* Stats Row */}

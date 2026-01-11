@@ -106,7 +106,7 @@ export function IdeaModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
@@ -114,7 +114,7 @@ export function IdeaModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[var(--card)] rounded-2xl shadow-2xl animate-scale-in border border-[var(--border)]">
+      <div className="relative w-full max-w-2xl max-h-[90vh] sm:max-h-[90vh] h-full sm:h-auto overflow-y-auto bg-[var(--card)] sm:rounded-2xl shadow-2xl animate-scale-in border-0 sm:border border-[var(--border)]">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
           <h2 className="text-xl font-semibold text-[var(--foreground)]">

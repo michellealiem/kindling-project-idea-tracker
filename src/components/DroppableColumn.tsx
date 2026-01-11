@@ -33,7 +33,7 @@ export function DroppableColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`w-80 flex-shrink-0 rounded-2xl p-4 flex flex-col border transition-all duration-200 ${
+      className={`w-64 sm:w-72 lg:w-80 flex-shrink-0 rounded-2xl p-3 sm:p-4 flex flex-col border transition-all duration-200 ${
         isOver
           ? 'border-[var(--primary)] bg-[var(--primary)]/5 shadow-lg shadow-[var(--primary)]/10'
           : 'border-[var(--border)] bg-[var(--background)]'

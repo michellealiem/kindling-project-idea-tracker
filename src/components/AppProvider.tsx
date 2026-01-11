@@ -6,7 +6,6 @@ import { useIdeas } from '@/hooks/useIdeas';
 import { parsePAIAData } from '@/lib/paia-parser';
 import { buildSparkDevelopmentPrompt } from '@/lib/ollama';
 import { Sidebar } from './Sidebar';
-import { Header } from './Header';
 import { IdeaModal } from './IdeaModal';
 import { ImportModal } from './ImportModal';
 import { Embers } from './Embers';
@@ -37,9 +36,12 @@ interface AppContextType {
 
   // Search & Filter
   searchQuery: string;
+  setSearchQuery: (query: string) => void;
   searchFilters: SearchFilters;
+  setSearchFilters: (filters: SearchFilters) => void;
   filteredIdeas: Idea[];
   isSearchActive: boolean;
+  allTags: string[];
 
   // Modal controls
   openNewIdeaModal: () => void;
@@ -178,9 +180,12 @@ export function AppProvider({ children }: AppProviderProps) {
     getIdeasByStage,
     getRecentIdeas,
     searchQuery,
+    setSearchQuery,
     searchFilters,
+    setSearchFilters,
     filteredIdeas,
     isSearchActive,
+    allTags,
     openNewIdeaModal,
     openEditIdeaModal,
   };
@@ -200,19 +205,7 @@ export function AppProvider({ children }: AppProviderProps) {
           onImportClick={() => setImportModalOpen(true)}
         />
 
-        <div className="flex-1 flex flex-col lg:ml-0">
-          <Header
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            filters={searchFilters}
-            onFiltersChange={setSearchFilters}
-            allTags={allTags}
-            onNewIdea={openNewIdeaModal}
-            resultCount={filteredIdeas.length}
-            isSearchActive={isSearchActive}
-          />
-          <main className="flex-1 pb-20 lg:pb-0">{children}</main>
-        </div>
+        <main className="flex-1 pb-20 lg:pb-0">{children}</main>
 
         {/* Floating Action Button (mobile) */}
         <button

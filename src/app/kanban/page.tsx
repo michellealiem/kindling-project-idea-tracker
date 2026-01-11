@@ -14,8 +14,9 @@ import {
 import { useApp } from '@/components/AppProvider';
 import { DroppableColumn } from '@/components/DroppableColumn';
 import { IdeaCard } from '@/components/IdeaCard';
+import { SearchBar } from '@/components/SearchBar';
 import { Stage } from '@/lib/types';
-import { Flame, Plus } from 'lucide-react';
+import { Flame } from 'lucide-react';
 
 const stages: Stage[] = ['spark', 'exploring', 'building', 'shipped', 'paused'];
 
@@ -29,6 +30,11 @@ export default function KanbanPage() {
     openEditIdeaModal,
     filteredIdeas,
     isSearchActive,
+    searchQuery,
+    setSearchQuery,
+    searchFilters,
+    setSearchFilters,
+    allTags,
   } = useApp();
 
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -101,7 +107,7 @@ export default function KanbanPage() {
     >
       <div className="p-6 lg:p-8 h-[calc(100vh-4rem)] lg:h-[calc(100vh-60px)] flex flex-col animate-fade-up">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 flex-shrink-0">
           <div>
             <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
               Kanban Board
@@ -111,6 +117,15 @@ export default function KanbanPage() {
                 ? `Showing ${filteredIdeas.length} filtered ideas`
                 : 'Drag cards to move between stages'}
             </p>
+          </div>
+          <div className="sm:w-64 lg:w-80">
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              filters={searchFilters}
+              onFiltersChange={setSearchFilters}
+              allTags={allTags}
+            />
           </div>
         </div>
 

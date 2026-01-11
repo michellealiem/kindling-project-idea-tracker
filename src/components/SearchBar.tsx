@@ -126,10 +126,18 @@ export function SearchBar({
         </button>
       </div>
 
-      {/* Filter panel */}
+      {/* Filter panel - bottom sheet on mobile, dropdown on desktop */}
       {showFilters && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-4 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-lg z-50 animate-scale-in max-w-2xl">
-          {/* Stage filters */}
+        <>
+          {/* Mobile backdrop */}
+          <div
+            className="sm:hidden fixed inset-0 bg-black/40 z-40"
+            onClick={() => setShowFilters(false)}
+          />
+          <div className="fixed sm:absolute inset-x-0 bottom-0 sm:bottom-auto sm:top-full sm:left-0 sm:right-0 sm:mt-2 p-4 pt-6 sm:pt-4 bg-[var(--card)] border border-[var(--border)] rounded-t-2xl sm:rounded-xl shadow-lg z-50 animate-scale-in sm:max-w-2xl max-h-[70vh] sm:max-h-none overflow-y-auto safe-area-pb">
+            {/* Mobile drag handle */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-[var(--muted)] rounded-full" />
+            {/* Stage filters */}
           <div className="mb-4">
             <label className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider mb-2 block">
               Stage
@@ -245,7 +253,8 @@ export function SearchBar({
               Clear all filters
             </button>
           )}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

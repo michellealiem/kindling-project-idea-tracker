@@ -13,6 +13,7 @@ import {
   Download,
   Upload,
 } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 interface SidebarProps {
   stats: {
@@ -116,6 +117,11 @@ export function Sidebar({ stats, onExport, onImportClick }: SidebarProps) {
             </div>
           </div>
         )}
+
+        {/* Theme Toggle */}
+        <div className="p-4 border-t border-[var(--border)] flex justify-center">
+          <ThemeToggle />
+        </div>
 
         {/* Import/Export */}
         <div className="p-4 border-t border-[var(--border)] space-y-2">

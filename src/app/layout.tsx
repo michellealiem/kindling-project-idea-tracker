@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthGate } from '@/components/AuthGate';
 import { AppProvider } from '@/components/AppProvider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Idea Forge | Project Tracker',
+  title: 'Kindling | Where Ideas Catch Fire',
   description: 'Track your ideas from spark to shipped. Build to explore.',
 };
 
@@ -25,13 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthGate>
-          <AppProvider>{children}</AppProvider>
-        </AuthGate>
+        <ThemeProvider>
+          <AuthGate>
+            <AppProvider>{children}</AppProvider>
+          </AuthGate>
+        </ThemeProvider>
       </body>
     </html>
   );
