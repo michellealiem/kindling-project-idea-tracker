@@ -1,0 +1,554 @@
+@import "tailwindcss";
+
+:root {
+  /*
+   * Design Philosophy: "Warm Workshop"
+   * Inspired by: A maker's studio at golden hour
+   * - Warm, inviting neutrals (not cold grays)
+   * - Accent colors that feel handpicked, not algorithmic
+   * - Stage colors that tell a story of progression
+   */
+
+  /* Base - Warm stone tones */
+  --background: #faf9f7;
+  --foreground: #2d2a26;
+  --card: #ffffff;
+  --card-foreground: #2d2a26;
+
+  /* Primary - Deep teal (distinctive, not purple) */
+  --primary: #0d7377;
+  --primary-light: #14919b;
+  --primary-dark: #0a5c5f;
+
+  /* Warm neutrals */
+  --secondary: #f5f3f0;
+  --secondary-foreground: #5c564e;
+  --muted: #ebe8e4;
+  --muted-foreground: #8a8279;
+  --border: #e5e1db;
+
+  /* Stage colors - A journey from spark to completion */
+  --spark: #e07b39;          /* Warm ember orange - the initial fire */
+  --spark-bg: #fef3eb;
+  --exploring: #7c6fb0;      /* Dusty violet - curiosity, wonder */
+  --exploring-bg: #f5f3fa;
+  --building: #2d8a6e;       /* Forest green - growth, creation */
+  --building-bg: #eef7f3;
+  --shipped: #3d7ea6;        /* Ocean blue - arrival, completion */
+  --shipped-bg: #eef5fa;
+  --paused: #9c958b;         /* Warm gray - resting, dormant */
+  --paused-bg: #f7f6f4;
+
+  /* Special */
+  --permasolution: #c9a227;  /* Antique gold - lasting value */
+  --permasolution-bg: #fdf9ed;
+
+  /* Accent for interactions */
+  --accent: #e07b39;
+  --ring: #0d7377;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1816;
+    --foreground: #ede9e3;
+    --card: #252220;
+    --card-foreground: #ede9e3;
+    --secondary: #2d2926;
+    --secondary-foreground: #c4bdb3;
+    --muted: #3a3532;
+    --muted-foreground: #9c958b;
+    --border: #3a3532;
+
+    /* Slightly brighter accents for dark mode */
+    --primary: #14a3a8;
+    --spark: #f08d4a;
+    --spark-bg: #2d2520;
+    --exploring: #9488c7;
+    --exploring-bg: #262330;
+    --building: #3da882;
+    --building-bg: #1f2d28;
+    --shipped: #4d96c4;
+    --shipped-bg: #1f262d;
+    --paused-bg: #262422;
+    --permasolution-bg: #2d2820;
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Custom scrollbar - subtle, warm */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* ============================================
+   ANIMATIONS - Purposeful & Delightful
+   ============================================ */
+
+/* Fade up - for cards entering */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale in - for modals */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide in from left - for sidebar elements */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Spark glow - for new ideas */
+@keyframes sparkGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(224, 123, 57, 0);
+  }
+  50% {
+    box-shadow: 0 0 24px 4px rgba(224, 123, 57, 0.2);
+  }
+}
+
+/* Shipped celebration */
+@keyframes celebrate {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-3deg); }
+  50% { transform: scale(1.1) rotate(3deg); }
+  75% { transform: scale(1.05) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Number count pop */
+@keyframes countPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Stagger children animation */
+@keyframes staggerFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Floating animation for empty states */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Shimmer for permasolution badge */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Pulse ring for active items */
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(13, 115, 119, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(13, 115, 119, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(13, 115, 119, 0); }
+}
+
+/* Animation utility classes */
+.animate-fade-up {
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-spark-glow {
+  animation: sparkGlow 2.5s ease-in-out infinite;
+}
+
+.animate-celebrate {
+  animation: celebrate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-count-pop {
+  animation: countPop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulseRing 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* Staggered children - add to parent */
+.stagger-children > * {
+  animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 480ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 540ms; }
+
+/* ============================================
+   CARD BASE - Standard card styling
+   ============================================ */
+
+.card-base {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.2s ease;
+}
+
+.card-base:hover {
+  border-color: var(--muted);
+  box-shadow: 0 8px 24px -8px rgba(45, 42, 38, 0.12),
+              0 4px 8px -4px rgba(45, 42, 38, 0.08);
+}
+
+/* ============================================
+   TRANSITIONS - Smooth & Intentional
+   ============================================ */
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -8px rgba(45, 42, 38, 0.15),
+              0 4px 10px -4px rgba(45, 42, 38, 0.1);
+}
+
+/* Button press effect */
+.btn-press {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.96);
+}
+
+/* Smooth color transitions */
+.color-transition {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ============================================
+   SPECIAL EFFECTS
+   ============================================ */
+
+/* Glass morphism - refined */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(37, 34, 32, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Gradient text - for special headings */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--building) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Warm shadows - more natural than pure black */
+.shadow-warm-sm {
+  box-shadow: 0 1px 3px rgba(45, 42, 38, 0.06);
+}
+
+.shadow-warm {
+  box-shadow: 0 4px 14px -3px rgba(45, 42, 38, 0.1),
+              0 2px 6px -2px rgba(45, 42, 38, 0.06);
+}
+
+.shadow-warm-lg {
+  box-shadow: 0 16px 40px -12px rgba(45, 42, 38, 0.15),
+              0 6px 12px -6px rgba(45, 42, 38, 0.08);
+}
+
+/* Focus ring - warm and visible */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+}
+
+/* Permasolution shimmer badge */
+.perma-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--permasolution) 0%,
+    #dbb844 25%,
+    var(--permasolution) 50%,
+    #dbb844 75%,
+    var(--permasolution) 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 4s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Stage indicator dots with hover */
+.stage-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stage-dot:hover {
+  transform: scale(1.4);
+}
+
+/* Empty state floating icon */
+.empty-state-icon {
+  color: var(--muted-foreground);
+  opacity: 0.4;
+}
+
+/* Kanban column styling */
+.kanban-column {
+  transition: background-color 0.2s ease;
+}
+
+.kanban-column-highlight {
+  background: linear-gradient(180deg, transparent 0%, rgba(13, 115, 119, 0.06) 100%);
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  background: rgba(45, 42, 38, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Progress bar animation */
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: var(--progress); }
+}
+
+.progress-bar {
+  animation: progressFill 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Tooltip fade */
+.tooltip {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tooltip-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   EMBER PARTICLES - Floating upward like heat
+   ============================================ */
+
+@keyframes emberRise {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(var(--drift, 20px)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes emberGlow {
+  0%, 100% {
+    opacity: 0.4;
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(0.5px);
+  }
+}
+
+@keyframes emberFlicker {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  75% {
+    transform: scale(1.05);
+  }
+}
+
+.embers-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.ember {
+  position: absolute;
+  bottom: -20px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--spark) 0%, transparent 70%);
+  box-shadow: 0 0 6px 2px rgba(224, 123, 57, 0.4),
+              0 0 12px 4px rgba(224, 123, 57, 0.2);
+  opacity: 0;
+  animation: emberRise linear infinite, emberGlow ease-in-out infinite;
+}
+
+/* Flicker variation */
+.ember.flicker {
+  animation: emberRise linear infinite, emberGlow ease-in-out infinite, emberFlicker ease-in-out infinite;
+}
+
+/* Different sizes */
+.ember.tiny {
+  width: 2px;
+  height: 2px;
+  box-shadow: 0 0 4px 1px rgba(224, 123, 57, 0.3),
+              0 0 8px 2px rgba(224, 123, 57, 0.15);
+}
+
+.ember.small {
+  width: 3px;
+  height: 3px;
+}
+
+.ember.medium {
+  width: 5px;
+  height: 5px;
+  box-shadow: 0 0 8px 3px rgba(224, 123, 57, 0.5),
+              0 0 16px 6px rgba(224, 123, 57, 0.25);
+}
+
+/* Brighter embers - occasional bright ones */
+.ember.bright {
+  background: radial-gradient(circle, #ffb366 0%, var(--spark) 40%, transparent 70%);
+  box-shadow: 0 0 8px 3px rgba(255, 179, 102, 0.6),
+              0 0 16px 6px rgba(224, 123, 57, 0.3);
+}
+
+/* Dark mode - embers stand out more */
+@media (prefers-color-scheme: dark) {
+  .ember {
+    box-shadow: 0 0 8px 3px rgba(240, 141, 74, 0.5),
+                0 0 16px 6px rgba(240, 141, 74, 0.25);
+  }
+
+  .ember.bright {
+    box-shadow: 0 0 10px 4px rgba(255, 179, 102, 0.7),
+                0 0 20px 8px rgba(240, 141, 74, 0.35);
+  }
+}
