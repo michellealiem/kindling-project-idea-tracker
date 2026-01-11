@@ -111,3 +111,11 @@ export const EFFORT_CONFIG: Record<Effort, { label: string; description: string 
   large: { label: 'Bonfire', description: '1 week+' },
   epic: { label: 'Inferno', description: 'Multi-week' },
 };
+
+// Search/Filter types
+export interface SearchFilters {
+  stages: Stage[];
+  types: IdeaType[];
+  efforts: Effort[];
+  tags: string[];
+}

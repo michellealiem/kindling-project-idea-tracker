@@ -12,6 +12,8 @@ interface IdeaModalProps {
   onUpdate: (id: string, updates: Partial<Idea>) => void;
   onDelete: (id: string) => void;
   onAISuggest?: (idea: Partial<Idea>) => void;
+  aiLoading?: boolean;
+  aiSuggestion?: string | null;
 }
 
 const stages: Stage[] = ['spark', 'exploring', 'building', 'shipped', 'paused'];
@@ -35,6 +37,8 @@ export function IdeaModal({
   onUpdate,
   onDelete,
   onAISuggest,
+  aiLoading,
+  aiSuggestion,
 }: IdeaModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -275,16 +279,48 @@ export function IdeaModal({
 
           {/* AI Suggestions - only show if handler provided */}
           {onAISuggest && (
-            <button
-              type="button"
-              onClick={() =>
-                onAISuggest({ title, description, stage, type, tags: tags.split(',').map((t) => t.trim()).filter(Boolean) })
-              }
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--spark)] to-[var(--primary)] text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg"
-            >
-              <Sparkles className="w-5 h-5" />
-              Get AI Suggestions
-            </button>
+            <div className="space-y-3">
+              <button
+                type="button"
+                disabled={aiLoading || !title.trim()}
+                onClick={() =>
+                  onAISuggest({ title, description, stage, type, tags: tags.split(',').map((t) => t.trim()).filter(Boolean) })
+                }
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--spark)] to-[var(--primary)] text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {aiLoading ? (
+                  <>
+                    <Flame className="w-5 h-5 animate-pulse" />
+                    Channeling the flames...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    Get AI Suggestions
+                  </>
+                )}
+              </button>
+
+              {/* AI Suggestion Display */}
+              {aiSuggestion && (
+                <div className="p-4 bg-gradient-to-r from-[var(--spark)]/10 to-[var(--primary)]/10 rounded-xl border border-[var(--spark)]/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-4 h-4 text-[var(--spark)]" />
+                    <span className="text-sm font-medium text-[var(--foreground)]">AI Suggestions</span>
+                  </div>
+                  <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap leading-relaxed">
+                    {aiSuggestion}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setNotes(prev => prev ? `${prev}\n\n---\nAI Suggestion:\n${aiSuggestion}` : `AI Suggestion:\n${aiSuggestion}`)}
+                    className="mt-3 text-xs text-[var(--primary)] hover:underline font-medium"
+                  >
+                    + Add to notes
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Actions */}

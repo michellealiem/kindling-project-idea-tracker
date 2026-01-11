@@ -6,6 +6,7 @@ import {
   Idea,
   Theme,
   Learning,
+  SearchFilters,
 } from '@/lib/types';
 import {
   getData,
@@ -133,6 +134,60 @@ export function useIdeas() {
     });
   }, []);
 
+  // Search and filter ideas
+  const searchIdeas = useCallback(
+    (query: string, filters: SearchFilters) => {
+      if (!data) return [];
+
+      let results = data.ideas;
+
+      // Text search (title, description, notes, tags)
+      if (query.trim()) {
+        const lowerQuery = query.toLowerCase();
+        results = results.filter(
+          (idea) =>
+            idea.title.toLowerCase().includes(lowerQuery) ||
+            idea.description.toLowerCase().includes(lowerQuery) ||
+            idea.notes.toLowerCase().includes(lowerQuery) ||
+            idea.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
+        );
+      }
+
+      // Filter by stage
+      if (filters.stages.length > 0) {
+        results = results.filter((idea) => filters.stages.includes(idea.stage));
+      }
+
+      // Filter by type
+      if (filters.types.length > 0) {
+        results = results.filter((idea) => filters.types.includes(idea.type));
+      }
+
+      // Filter by effort
+      if (filters.efforts.length > 0) {
+        results = results.filter((idea) => filters.efforts.includes(idea.effort));
+      }
+
+      // Filter by tags
+      if (filters.tags.length > 0) {
+        results = results.filter((idea) =>
+          filters.tags.some((tag) => idea.tags.includes(tag))
+        );
+      }
+
+      return results;
+    },
+    [data]
+  );
+
+  // Get all unique tags for filter dropdown
+  const getAllTags = useCallback(() => {
+    if (!data) return [];
+    const tagSet = new Set<string>();
+    data.ideas.forEach((idea) => idea.tags.forEach((tag) => tagSet.add(tag)));
+    return Array.from(tagSet).sort();
+  }, [data]);
+
   return {
     data,
     isLoading,
@@ -152,5 +207,7 @@ export function useIdeas() {
     getIdeasByStage,
     getRecentIdeas,
     updateSettings,
+    searchIdeas,
+    getAllTags,
   };
 }

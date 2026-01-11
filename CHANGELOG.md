@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-10-E] - Mouse Sparks & Password Protection
+
+### Added
+
+**Interactive Mouse Sparks:**
+- Fire spark trail follows mouse cursor movement
+- Orange/amber glowing particles drift upward like embers
+- Touch support for mobile devices (touchmove/touchstart)
+- Smooth physics with gradual fade-out
+- Complements existing background ember particles
+
+**Password Protection:**
+- Simple password gate for private access
+- 30-day cookie remembers authenticated devices
+- Clean login UI with Kindling branding
+- Password set via `SITE_PASSWORD` environment variable in Netlify
+- No password required for local development
+
+### Files Created
+- `src/components/MouseSparks.tsx` - Canvas-based mouse trail animation
+- `src/components/AuthGate.tsx` - Password protection wrapper
+- `src/app/api/auth/route.ts` - Authentication API endpoint
+
+### Files Modified
+- `src/app/layout.tsx` - Wrapped app with AuthGate
+- `src/components/AppProvider.tsx` - Added MouseSparks component
+- `src/app/globals.css` - Added mouse-sparks-canvas styles
+- `.env.local` - Added SITE_PASSWORD configuration
+
+---
+
 ## [2026-01-10-D] - Matchstick Favicon
 
 ### Changed
@@ -145,4 +176,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-10
+**Last Updated:** 2026-01-10E

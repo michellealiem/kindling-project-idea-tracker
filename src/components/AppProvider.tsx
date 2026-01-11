@@ -1,14 +1,24 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import { Idea } from '@/lib/types';
+import { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
+import { Idea, SearchFilters } from '@/lib/types';
 import { useIdeas } from '@/hooks/useIdeas';
 import { parsePAIAData } from '@/lib/paia-parser';
+import { buildSparkDevelopmentPrompt } from '@/lib/ollama';
 import { Sidebar } from './Sidebar';
+import { Header } from './Header';
 import { IdeaModal } from './IdeaModal';
 import { ImportModal } from './ImportModal';
 import { Embers } from './Embers';
+import { MouseSparks } from './MouseSparks';
 import { Plus } from 'lucide-react';
+
+const emptyFilters: SearchFilters = {
+  stages: [],
+  types: [],
+  efforts: [],
+  tags: [],
+};
 
 interface AppContextType {
   // Data
@@ -24,6 +34,12 @@ interface AppContextType {
   deleteIdea: ReturnType<typeof useIdeas>['deleteIdea'];
   getIdeasByStage: ReturnType<typeof useIdeas>['getIdeasByStage'];
   getRecentIdeas: ReturnType<typeof useIdeas>['getRecentIdeas'];
+
+  // Search & Filter
+  searchQuery: string;
+  searchFilters: SearchFilters;
+  filteredIdeas: Idea[];
+  isSearchActive: boolean;
 
   // Modal controls
   openNewIdeaModal: () => void;
@@ -59,12 +75,37 @@ export function AppProvider({ children }: AppProviderProps) {
     exportToFile,
     importFromJson,
     importPAIAData,
+    searchIdeas,
+    getAllTags,
   } = useIdeas();
 
   // Modal state
   const [ideaModalOpen, setIdeaModalOpen] = useState(false);
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
   const [importModalOpen, setImportModalOpen] = useState(false);
+
+  // AI suggestion state
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
+
+  // Search & Filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>(emptyFilters);
+
+  // Compute filtered ideas
+  const isSearchActive =
+    searchQuery.trim() !== '' ||
+    searchFilters.stages.length > 0 ||
+    searchFilters.types.length > 0 ||
+    searchFilters.efforts.length > 0 ||
+    searchFilters.tags.length > 0;
+
+  const filteredIdeas = useMemo(
+    () => (isSearchActive ? searchIdeas(searchQuery, searchFilters) : ideas),
+    [isSearchActive, searchQuery, searchFilters, searchIdeas, ideas]
+  );
+
+  const allTags = useMemo(() => getAllTags(), [getAllTags]);
 
   const openNewIdeaModal = useCallback(() => {
     setEditingIdea(null);
@@ -79,6 +120,42 @@ export function AppProvider({ children }: AppProviderProps) {
   const closeIdeaModal = useCallback(() => {
     setIdeaModalOpen(false);
     setEditingIdea(null);
+    setAiSuggestion(null);
+  }, []);
+
+  const handleAISuggest = useCallback(async (ideaData: Partial<Idea>) => {
+    setAiLoading(true);
+    setAiSuggestion(null);
+
+    try {
+      const prompt = buildSparkDevelopmentPrompt(
+        ideaData.title || '',
+        ideaData.description || ''
+      );
+
+      const response = await fetch('/api/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, type: 'spark-development' }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'AI request failed');
+      }
+
+      const data = await response.json();
+      setAiSuggestion(data.suggestion);
+    } catch (error) {
+      console.error('AI suggestion error:', error);
+      setAiSuggestion(
+        error instanceof Error
+          ? `Unable to get AI suggestions: ${error.message}`
+          : 'Unable to get AI suggestions. Make sure Ollama is running.'
+      );
+    } finally {
+      setAiLoading(false);
+    }
   }, []);
 
   const handleImportPAIA = useCallback(
@@ -100,6 +177,10 @@ export function AppProvider({ children }: AppProviderProps) {
     deleteIdea,
     getIdeasByStage,
     getRecentIdeas,
+    searchQuery,
+    searchFilters,
+    filteredIdeas,
+    isSearchActive,
     openNewIdeaModal,
     openEditIdeaModal,
   };
@@ -110,13 +191,28 @@ export function AppProvider({ children }: AppProviderProps) {
         {/* Ember particles floating upward */}
         <Embers />
 
+        {/* Mouse-following fire sparks */}
+        <MouseSparks />
+
         <Sidebar
           stats={stats}
           onExport={exportToFile}
           onImportClick={() => setImportModalOpen(true)}
         />
 
-        <main className="flex-1 lg:ml-0 pb-20 lg:pb-0">{children}</main>
+        <div className="flex-1 flex flex-col lg:ml-0">
+          <Header
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            filters={searchFilters}
+            onFiltersChange={setSearchFilters}
+            allTags={allTags}
+            onNewIdea={openNewIdeaModal}
+            resultCount={filteredIdeas.length}
+            isSearchActive={isSearchActive}
+          />
+          <main className="flex-1 pb-20 lg:pb-0">{children}</main>
+        </div>
 
         {/* Floating Action Button (mobile) */}
         <button
@@ -135,6 +231,9 @@ export function AppProvider({ children }: AppProviderProps) {
           onSave={addIdea}
           onUpdate={updateIdea}
           onDelete={deleteIdea}
+          onAISuggest={handleAISuggest}
+          aiLoading={aiLoading}
+          aiSuggestion={aiSuggestion}
         />
 
         <ImportModal
