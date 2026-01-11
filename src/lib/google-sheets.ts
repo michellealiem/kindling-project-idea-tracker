@@ -316,6 +316,39 @@ export async function getAllData(): Promise<AppData> {
   };
 }
 
+// Bulk sync ideas from localStorage to Google Sheets
+// Skips ideas that already exist (by ID), creates new ones
+export async function bulkSyncIdeas(ideas: Idea[]): Promise<{ created: number; skipped: number; errors: string[] }> {
+  const doc = await getSpreadsheet();
+  const sheet = doc.sheetsByTitle['Ideas'];
+  if (!sheet) throw new Error('Ideas sheet not found. Run initializeSheets first.');
+
+  // Get existing IDs
+  const existingRows = await sheet.getRows<Record<string, string>>();
+  const existingIds = new Set(existingRows.map(r => r.get('id')));
+
+  let created = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+
+  for (const idea of ideas) {
+    if (existingIds.has(idea.id)) {
+      skipped++;
+      continue;
+    }
+
+    try {
+      await sheet.addRow(ideaToRow(idea));
+      created++;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      errors.push(`Failed to sync "${idea.title}": ${msg}`);
+    }
+  }
+
+  return { created, skipped, errors };
+}
+
 // Initialize sheets with headers (run once)
 export async function initializeSheets(): Promise<void> {
   const doc = await getSpreadsheet();
