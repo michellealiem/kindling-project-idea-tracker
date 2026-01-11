@@ -14,27 +14,63 @@ export function isGoogleSheetsConfigured(): boolean {
   );
 }
 
+// Parse the private key from environment variable
+// Netlify can store it in various formats, so we try multiple approaches
+function parsePrivateKey(rawKey: string): string {
+  let key = rawKey;
+
+  // Remove surrounding quotes if present
+  if ((key.startsWith('"') && key.endsWith('"')) ||
+      (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+
+  // Replace literal \n sequences with actual newlines
+  // This handles: \\n, \n as literal characters
+  key = key.replace(/\\n/g, '\n');
+
+  // If the key doesn't look valid, try JSON.parse as a last resort
+  // (in case Netlify stored it as a JSON string)
+  if (!key.includes('-----BEGIN') && rawKey.startsWith('"')) {
+    try {
+      key = JSON.parse(rawKey);
+    } catch {
+      // JSON parse failed, continue with what we have
+    }
+  }
+
+  return key;
+}
+
+// Debug function to help diagnose key format issues
+export function debugKeyFormat(): {
+  hasKey: boolean;
+  keyLength: number;
+  startsWithBegin: boolean;
+  hasNewlines: boolean;
+  firstChars: string;
+  lastChars: string;
+} {
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
+  const parsedKey = rawKey ? parsePrivateKey(rawKey) : '';
+
+  return {
+    hasKey: !!rawKey,
+    keyLength: rawKey.length,
+    startsWithBegin: parsedKey.startsWith('-----BEGIN'),
+    hasNewlines: parsedKey.includes('\n'),
+    firstChars: parsedKey.substring(0, 30).replace(/\n/g, '\\n'),
+    lastChars: parsedKey.substring(parsedKey.length - 30).replace(/\n/g, '\\n'),
+  };
+}
+
 // Initialize auth - uses service account credentials
 function getAuth() {
   if (!isGoogleSheetsConfigured()) {
     throw new Error('Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, and GOOGLE_SHEET_ID environment variables.');
   }
 
-  // Handle private key - Netlify may store it with literal \n or actual newlines
-  let privateKey = process.env.GOOGLE_PRIVATE_KEY!;
-
-  // Try multiple replacement strategies for the newlines
-  // Strategy 1: Replace literal backslash-n (most common from JSON copy)
-  privateKey = privateKey.split('\\n').join('\n');
-
-  // Strategy 2: If still has issues, try replacing escaped backslash
-  privateKey = privateKey.split('\\\\n').join('\n');
-
-  // Strategy 3: Remove any surrounding quotes that Netlify might have added
-  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
-    privateKey = privateKey.slice(1, -1);
-    privateKey = privateKey.split('\\n').join('\n');
-  }
+  const privateKey = parsePrivateKey(process.env.GOOGLE_PRIVATE_KEY!);
 
   const credentials = {
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
