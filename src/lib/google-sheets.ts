@@ -44,7 +44,7 @@ function rowToIdea(row: GoogleSpreadsheetRow<Record<string, string>>): Idea {
     description: row.get('description') || '',
     stage: row.get('stage') as Stage,
     type: row.get('type') as IdeaType,
-    tags: tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [],
+    tags: tagsStr ? tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
     effort: row.get('effort') as Effort,
     notes: row.get('notes') || '',
     createdAt: row.get('createdAt'),
