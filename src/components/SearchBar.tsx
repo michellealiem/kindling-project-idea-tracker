@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, X, Filter, Zap, Flame, Lightbulb, CircleDot } from 'lucide-react';
+import { Search as SearchIcon, X, Filter, Zap, Flame, Lightbulb, CircleDot, Clock, Search } from 'lucide-react';
 import { Stage, IdeaType, Effort, STAGE_CONFIG, TYPE_CONFIG, EFFORT_CONFIG, SearchFilters } from '@/lib/types';
 
 interface SearchBarProps {
@@ -12,14 +12,16 @@ interface SearchBarProps {
   allTags: string[];
 }
 
-const stages: Stage[] = ['spark', 'exploring', 'building', 'shipped', 'paused'];
+const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
 const types: IdeaType[] = ['permasolution', 'project', 'experiment', 'learning'];
 const efforts: Effort[] = ['trivial', 'small', 'medium', 'large', 'epic'];
 
 const stageIcons: Record<Stage, typeof Zap> = {
   spark: Zap,
-  exploring: Flame,
+  exploring: Search,
   building: Flame,
+  waiting: Clock,
+  simmering: Flame,
   shipped: Lightbulb,
   paused: CircleDot,
 };
@@ -91,7 +93,7 @@ export function SearchBar({
       {/* Search input */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" />
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" />
           <input
             type="text"
             value={searchQuery}

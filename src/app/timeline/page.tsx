@@ -1,8 +1,8 @@
 'use client';
 
 import { useApp } from '@/components/AppProvider';
-import { STAGE_CONFIG } from '@/lib/types';
-import { Zap, Flame, Lightbulb, CircleDot, Calendar, Crown } from 'lucide-react';
+import { Stage, STAGE_CONFIG } from '@/lib/types';
+import { Zap, Flame, Lightbulb, CircleDot, Calendar, Crown, Clock, Search } from 'lucide-react';
 
 export default function TimelinePage() {
   const { ideas, isLoading, openEditIdeaModal } = useApp();
@@ -19,13 +19,19 @@ export default function TimelinePage() {
   }
 
   // Get all stage changes across all ideas, sorted by date
+  // Use startedAt for the first stage entry if available (for backdated projects)
   const timelineEvents = ideas
     .flatMap((idea) =>
-      idea.stageHistory.map((entry) => ({
-        idea,
-        stage: entry.stage,
-        date: new Date(entry.date),
-      }))
+      idea.stageHistory.map((entry, index) => {
+        // For the first stage entry, use startedAt if available
+        const useStartedAt = index === 0 && idea.startedAt;
+        return {
+          idea,
+          stage: entry.stage,
+          date: new Date(useStartedAt ? idea.startedAt! : entry.date),
+          isBackdated: useStartedAt ? true : false,
+        };
+      })
     )
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
@@ -43,22 +49,26 @@ export default function TimelinePage() {
     groupedEvents[dateKey].push(event);
   }
 
-  // Fire-themed stage icons
-  const stageIcons = {
+  // Stage icons matching the new 7-stage system
+  const stageIcons: Record<Stage, React.ReactNode> = {
     spark: <Zap className="w-4 h-4" />,
-    exploring: <Flame className="w-4 h-4" />,
+    exploring: <Search className="w-4 h-4" />,
     building: <Flame className="w-4 h-4" />,
+    waiting: <Clock className="w-4 h-4" />,
+    simmering: <Flame className="w-4 h-4" />,
     shipped: <Lightbulb className="w-4 h-4" />,
     paused: <CircleDot className="w-4 h-4" />,
   };
 
-  // Fire-themed stage descriptions
-  const stageDescriptions = {
-    spark: 'Spark ignited',
-    exploring: 'Started kindling',
-    building: 'Now blazing',
-    shipped: 'Lit as beacon!',
-    paused: 'Banked for later',
+  // Stage descriptions for timeline events
+  const stageDescriptions: Record<Stage, string> = {
+    spark: 'New idea captured',
+    exploring: 'Started exploring',
+    building: 'Now active',
+    waiting: 'Waiting on blockers',
+    simmering: 'Now simmering',
+    shipped: 'Shipped!',
+    paused: 'Paused',
   };
 
   return (
@@ -136,6 +146,12 @@ export default function TimelinePage() {
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--permasolution)]/10 text-[var(--permasolution)] rounded-full text-xs font-medium animate-shimmer">
                                 <Crown className="w-3 h-3" />
                                 Perma
+                              </span>
+                            )}
+                            {event.isBackdated && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--muted)]/10 text-[var(--muted)] rounded-full text-xs font-medium">
+                                <Clock className="w-3 h-3" />
+                                Backdated
                               </span>
                             )}
                           </div>

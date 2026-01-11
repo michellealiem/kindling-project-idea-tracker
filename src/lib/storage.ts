@@ -151,6 +151,8 @@ export function getStats(data: AppData) {
     spark: data.ideas.filter((i) => i.stage === 'spark').length,
     exploring: data.ideas.filter((i) => i.stage === 'exploring').length,
     building: data.ideas.filter((i) => i.stage === 'building').length,
+    waiting: data.ideas.filter((i) => i.stage === 'waiting').length,
+    simmering: data.ideas.filter((i) => i.stage === 'simmering').length,
     shipped: data.ideas.filter((i) => i.stage === 'shipped').length,
     paused: data.ideas.filter((i) => i.stage === 'paused').length,
   };

@@ -6,6 +6,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-C] - ChatBot & Start Date Feature
+
+### Added
+
+**AI Chatbot (Kindling Companion):**
+- Slide-out chat panel available on all pages (Dashboard, Kanban, Timeline, Insights)
+- Floating chat button in bottom-right corner
+- Conversational AI powered by local Ollama
+- Context-aware responses with access to all ideas, themes, and learnings
+- Example prompts: "What patterns do you see?", "Which sparks should I focus on?"
+- Mobile-responsive design (full screen on mobile, panel on desktop)
+
+**Start Date for Backdating:**
+- New "Started Date" field in idea creation/edit modal
+- Auto-populates with today's date (PST timezone)
+- Allows backdating for projects you forgot to add
+- Timeline respects start date for accurate historical positioning
+- "Backdated" badge shows on timeline for backdated entries
+
+**7-Stage System Support:**
+- Added `waiting` stage (blocked on feedback/dependency)
+- Added `simmering` stage (slow background progress)
+- Updated all components with new stage icons (Search, Clock icons)
+
+### Files Created
+- `src/components/ChatBot.tsx` - Slide-out AI chat component
+- `src/app/api/chat/route.ts` - Conversational Ollama API endpoint
+
+### Files Modified
+- `src/lib/types.ts` - Added `startedAt` field, `waiting`/`simmering` stages
+- `src/components/IdeaModal.tsx` - Added start date picker with PST auto-populate
+- `src/components/AppProvider.tsx` - Integrated ChatBot component
+- `src/app/timeline/page.tsx` - Uses startedAt for timeline positioning
+- `src/components/IdeaCard.tsx` - Updated stage icons for 7-stage system
+- `src/components/DroppableColumn.tsx` - Updated stage icons
+- `src/components/SearchBar.tsx` - Updated stage icons and filters
+
+---
+
 ## [2026-01-11-B] - Browser Title Update
 
 ### Changed
@@ -221,4 +260,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11B
+**Last Updated:** 2026-01-11C

@@ -8,6 +8,7 @@ import { buildSparkDevelopmentPrompt } from '@/lib/ollama';
 import { Sidebar } from './Sidebar';
 import { IdeaModal } from './IdeaModal';
 import { ImportModal } from './ImportModal';
+import { ChatBot } from './ChatBot';
 import { Embers } from './Embers';
 import { MouseSparks } from './MouseSparks';
 import { Plus } from 'lucide-react';
@@ -234,6 +235,30 @@ export function AppProvider({ children }: AppProviderProps) {
           onClose={() => setImportModalOpen(false)}
           onImportJSON={importFromJson}
           onImportPAIA={handleImportPAIA}
+        />
+
+        {/* ChatBot - available on all pages */}
+        <ChatBot
+          ideas={ideas.map(i => ({
+            id: i.id,
+            title: i.title,
+            description: i.description,
+            stage: i.stage,
+            type: i.type,
+            tags: i.tags,
+            notes: i.notes,
+          }))}
+          themes={themes.map(t => ({
+            id: t.id,
+            title: t.title,
+            description: t.description,
+          }))}
+          learnings={learnings.map(l => ({
+            id: l.id,
+            title: l.title,
+            context: l.context,
+            discovery: l.discovery,
+          }))}
         />
       </div>
     </AppContext.Provider>

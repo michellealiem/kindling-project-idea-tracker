@@ -10,6 +10,8 @@ import {
   Lightbulb,
   Crown,
   Plus,
+  Search,
+  Clock,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -40,7 +42,9 @@ export default function DashboardPage() {
     );
   }
 
-  const buildingIdeas = getIdeasByStage('building');
+  const activeIdeas = getIdeasByStage('building');
+  const waitingIdeas = getIdeasByStage('waiting');
+  const simmeringIdeas = getIdeasByStage('simmering');
   const recentSparks = getIdeasByStage('spark').slice(0, 5);
   const recentShipped = getIdeasByStage('shipped').slice(0, 5);
 
@@ -78,31 +82,47 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8 stagger-children">
+      {/* Stats Row - Primary stages */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 stagger-children">
         <StatsCard
-          label="Sparks"
+          label="Ideas"
           value={stats?.byStage.spark ?? 0}
           icon={<Zap className="w-6 h-6" />}
           stage="spark"
         />
         <StatsCard
-          label="Kindling"
+          label="Exploring"
           value={stats?.byStage.exploring ?? 0}
-          icon={<Flame className="w-6 h-6" />}
+          icon={<Search className="w-6 h-6" />}
           stage="exploring"
         />
         <StatsCard
-          label="Blazing"
+          label="Active"
           value={stats?.byStage.building ?? 0}
           icon={<Flame className="w-6 h-6" />}
           stage="building"
         />
         <StatsCard
-          label="Beacons"
+          label="Shipped"
           value={stats?.byStage.shipped ?? 0}
           icon={<Lightbulb className="w-6 h-6" />}
           stage="shipped"
+        />
+      </div>
+
+      {/* Stats Row - Secondary stages */}
+      <div className="grid grid-cols-3 lg:grid-cols-3 gap-4 mb-8 stagger-children">
+        <StatsCard
+          label="Waiting"
+          value={stats?.byStage.waiting ?? 0}
+          icon={<Clock className="w-6 h-6" />}
+          stage="waiting"
+        />
+        <StatsCard
+          label="Simmering"
+          value={stats?.byStage.simmering ?? 0}
+          icon={<Flame className="w-6 h-6 opacity-60" />}
+          stage="simmering"
         />
         <StatsCard
           label="Eternal Flames"
@@ -114,36 +134,42 @@ export default function DashboardPage() {
 
       {/* Main Grid */}
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Currently Building - Takes 2 columns */}
-        <div className="lg:col-span-2">
+        {/* Currently Active - Takes 2 columns */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Active Projects */}
           <div className="card-base p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="p-1.5 rounded-lg bg-[var(--building-bg)]">
                 <Flame className="w-5 h-5 text-[var(--building)]" />
               </div>
               <h2 className="text-lg font-semibold text-[var(--foreground)]">
-                Currently Blazing
+                Currently Active
               </h2>
+              {activeIdeas.length > 3 && (
+                <span className="text-xs text-[var(--spark)] bg-[var(--spark-bg)] px-2 py-0.5 rounded-full">
+                  {activeIdeas.length} active - consider focusing!
+                </span>
+              )}
             </div>
 
-            {buildingIdeas.length === 0 ? (
+            {activeIdeas.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--building-bg)] flex items-center justify-center">
                   <Flame className="w-8 h-8 text-[var(--building)] opacity-50" />
                 </div>
                 <p className="text-[var(--muted)] mb-4">
-                  No flames blazing yet
+                  No active projects yet
                 </p>
                 <button
                   onClick={openNewIdeaModal}
                   className="text-[var(--primary)] font-medium hover:underline underline-offset-4 transition-all"
                 >
-                  Start a blaze
+                  Start building something
                 </button>
               </div>
             ) : (
               <div className="grid gap-4 stagger-children">
-                {buildingIdeas.map((idea) => (
+                {activeIdeas.map((idea) => (
                   <IdeaCard
                     key={idea.id}
                     idea={idea}
@@ -153,9 +179,60 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+          {/* Waiting & Simmering row */}
+          {(waitingIdeas.length > 0 || simmeringIdeas.length > 0) && (
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Waiting */}
+              {waitingIdeas.length > 0 && (
+                <div className="card-base p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 rounded-lg bg-[var(--waiting-bg)]">
+                      <Clock className="w-4 h-4 text-[var(--waiting)]" />
+                    </div>
+                    <h3 className="font-medium text-[var(--foreground)]">Waiting</h3>
+                    <span className="text-xs text-[var(--muted)]">({waitingIdeas.length})</span>
+                  </div>
+                  <div className="space-y-2">
+                    {waitingIdeas.slice(0, 3).map((idea) => (
+                      <IdeaCard
+                        key={idea.id}
+                        idea={idea}
+                        onClick={openEditIdeaModal}
+                        compact
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Simmering */}
+              {simmeringIdeas.length > 0 && (
+                <div className="card-base p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 rounded-lg bg-[var(--simmering-bg)]">
+                      <Flame className="w-4 h-4 text-[var(--simmering)] opacity-60" />
+                    </div>
+                    <h3 className="font-medium text-[var(--foreground)]">Simmering</h3>
+                    <span className="text-xs text-[var(--muted)]">({simmeringIdeas.length})</span>
+                  </div>
+                  <div className="space-y-2">
+                    {simmeringIdeas.slice(0, 3).map((idea) => (
+                      <IdeaCard
+                        key={idea.id}
+                        idea={idea}
+                        onClick={openEditIdeaModal}
+                        compact
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Recent Sparks */}
+        {/* Recent Ideas */}
         <div className="space-y-8">
           <div className="card-base p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -163,7 +240,7 @@ export default function DashboardPage() {
                 <Zap className="w-5 h-5 text-[var(--spark)]" />
               </div>
               <h2 className="text-lg font-semibold text-[var(--foreground)]">
-                Recent Sparks
+                Recent Ideas
               </h2>
             </div>
 
@@ -173,7 +250,7 @@ export default function DashboardPage() {
                   <Zap className="w-7 h-7 text-[var(--spark)] opacity-50" />
                 </div>
                 <p className="text-sm text-[var(--muted)]">
-                  No sparks yet. Strike your first!
+                  No ideas yet. Capture your first!
                 </p>
               </div>
             ) : (
@@ -197,7 +274,7 @@ export default function DashboardPage() {
                 <Lightbulb className="w-5 h-5 text-[var(--shipped)]" />
               </div>
               <h2 className="text-lg font-semibold text-[var(--foreground)]">
-                Recent Beacons
+                Recently Shipped
               </h2>
             </div>
 
@@ -207,7 +284,7 @@ export default function DashboardPage() {
                   <Lightbulb className="w-7 h-7 text-[var(--shipped)] opacity-50" />
                 </div>
                 <p className="text-sm text-[var(--muted)]">
-                  Light your first beacon!
+                  Ship your first project!
                 </p>
               </div>
             ) : (

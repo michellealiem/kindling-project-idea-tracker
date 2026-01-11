@@ -1,7 +1,7 @@
 'use client';
 
-import { Idea, STAGE_CONFIG, TYPE_CONFIG } from '@/lib/types';
-import { Shield, Clock, Tag, Zap, Flame, Lightbulb, CircleDot, Crown } from 'lucide-react';
+import { Idea, Stage, STAGE_CONFIG, TYPE_CONFIG } from '@/lib/types';
+import { Shield, Clock, Tag, Zap, Flame, Lightbulb, CircleDot, Crown, Search, LucideIcon } from 'lucide-react';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -9,11 +9,13 @@ interface IdeaCardProps {
   compact?: boolean;
 }
 
-// Fire-themed stage icons: Spark → Kindling → Blazing → Beacon → Banked
-const stageIcons = {
+// Stage icons matching the 7-stage system
+const stageIcons: Record<Stage, LucideIcon> = {
   spark: Zap,
-  exploring: Flame,
+  exploring: Search,
   building: Flame,
+  waiting: Clock,
+  simmering: Flame,
   shipped: Lightbulb,
   paused: CircleDot,
 };

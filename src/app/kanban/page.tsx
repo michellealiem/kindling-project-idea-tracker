@@ -18,7 +18,7 @@ import { SearchBar } from '@/components/SearchBar';
 import { Stage } from '@/lib/types';
 import { Flame } from 'lucide-react';
 
-const stages: Stage[] = ['spark', 'exploring', 'building', 'shipped', 'paused'];
+const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
 
 export default function KanbanPage() {
   const {

@@ -4,12 +4,14 @@ import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Stage, STAGE_CONFIG, Idea } from '@/lib/types';
 import { DraggableIdeaCard } from './DraggableIdeaCard';
-import { Zap, Flame, Lightbulb, CircleDot, Plus } from 'lucide-react';
+import { Zap, Flame, Lightbulb, CircleDot, Plus, Clock, Search } from 'lucide-react';
 
 const stageIcons: Record<Stage, React.ReactNode> = {
   spark: <Zap className="w-5 h-5" />,
-  exploring: <Flame className="w-5 h-5" />,
+  exploring: <Search className="w-5 h-5" />,
   building: <Flame className="w-5 h-5" />,
+  waiting: <Clock className="w-5 h-5" />,
+  simmering: <Flame className="w-5 h-5" />,
   shipped: <Lightbulb className="w-5 h-5" />,
   paused: <CircleDot className="w-5 h-5" />,
 };

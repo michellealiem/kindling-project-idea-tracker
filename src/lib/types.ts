@@ -1,6 +1,6 @@
 // Core data types for Kindling - Where Ideas Catch Fire
 
-export type Stage = 'spark' | 'exploring' | 'building' | 'shipped' | 'paused';
+export type Stage = 'spark' | 'exploring' | 'building' | 'waiting' | 'simmering' | 'shipped' | 'paused';
 export type IdeaType = 'permasolution' | 'project' | 'experiment' | 'learning';
 export type Effort = 'trivial' | 'small' | 'medium' | 'large' | 'epic';
 
@@ -20,6 +20,7 @@ export interface Idea {
   notes: string;
   createdAt: string;
   updatedAt: string;
+  startedAt?: string; // Optional: when work actually began (for backdating old projects)
   stageHistory: StageHistoryEntry[];
   aiSuggestions?: string[];
 }
@@ -57,39 +58,60 @@ export interface AppData {
   };
 }
 
-// Stage configuration for UI - Fire-themed progression
-// Spark → Kindling → Blazing → Beacon → Banked
-export const STAGE_CONFIG: Record<Stage, { label: string; color: string; bgColor: string; borderColor: string; icon: string }> = {
+// Stage configuration for UI - 7-stage progression
+// Idea → Exploring → Active/Waiting/Simmering → Shipped → Paused
+export const STAGE_CONFIG: Record<Stage, { label: string; description: string; color: string; bgColor: string; borderColor: string; icon: string }> = {
   spark: {
-    label: 'Spark',
+    label: 'Idea',
+    description: 'A new idea just captured, not yet explored',
     color: 'text-[var(--spark)]',
     bgColor: 'bg-[var(--spark-bg)]',
     borderColor: 'border-[var(--spark)]/20',
     icon: 'Zap'
   },
   exploring: {
-    label: 'Kindling',
+    label: 'Exploring',
+    description: 'Researching, planning, or validating the idea',
     color: 'text-[var(--exploring)]',
     bgColor: 'bg-[var(--exploring-bg)]',
     borderColor: 'border-[var(--exploring)]/20',
-    icon: 'Flame'
+    icon: 'Search'
   },
   building: {
-    label: 'Blazing',
+    label: 'Active',
+    description: 'Currently working on this (try to limit to 1-3)',
     color: 'text-[var(--building)]',
     bgColor: 'bg-[var(--building-bg)]',
     borderColor: 'border-[var(--building)]/20',
     icon: 'Flame'
   },
+  waiting: {
+    label: 'Waiting',
+    description: 'Blocked on feedback, decision, or external dependency',
+    color: 'text-[var(--waiting)]',
+    bgColor: 'bg-[var(--waiting-bg)]',
+    borderColor: 'border-[var(--waiting)]/20',
+    icon: 'Clock'
+  },
+  simmering: {
+    label: 'Simmering',
+    description: 'Background project with slow, occasional progress',
+    color: 'text-[var(--simmering)]',
+    bgColor: 'bg-[var(--simmering-bg)]',
+    borderColor: 'border-[var(--simmering)]/20',
+    icon: 'Flame'
+  },
   shipped: {
-    label: 'Beacon',
+    label: 'Shipped',
+    description: 'Complete and released into the world',
     color: 'text-[var(--shipped)]',
     bgColor: 'bg-[var(--shipped-bg)]',
     borderColor: 'border-[var(--shipped)]/20',
     icon: 'Lightbulb'
   },
   paused: {
-    label: 'Banked',
+    label: 'Paused',
+    description: 'On hold - not abandoned, just resting',
     color: 'text-[var(--paused)]',
     bgColor: 'bg-[var(--paused-bg)]',
     borderColor: 'border-[var(--paused)]/20',
@@ -97,11 +119,31 @@ export const STAGE_CONFIG: Record<Stage, { label: string; color: string; bgColor
   },
 };
 
-export const TYPE_CONFIG: Record<IdeaType, { label: string; color: string; description: string }> = {
-  permasolution: { label: 'Eternal Flame', color: 'text-[var(--permasolution)]', description: 'Build once, burns forever' },
-  project: { label: 'Campfire', color: 'text-[var(--exploring)]', description: 'Needs tending' },
-  experiment: { label: 'Test Spark', color: 'text-[var(--spark)]', description: 'See if it catches' },
-  learning: { label: 'Torch', color: 'text-[var(--primary)]', description: 'Light the way' },
+export const TYPE_CONFIG: Record<IdeaType, { label: string; color: string; description: string; longDescription: string }> = {
+  permasolution: {
+    label: 'Eternal Flame',
+    color: 'text-[var(--permasolution)]',
+    description: 'Build once, burns forever',
+    longDescription: 'A solution built once that runs indefinitely without ongoing maintenance. Set it up and forget it.'
+  },
+  project: {
+    label: 'Campfire',
+    color: 'text-[var(--exploring)]',
+    description: 'Needs tending',
+    longDescription: 'A project requiring ongoing attention, updates, or maintenance to keep running.'
+  },
+  experiment: {
+    label: 'Test Spark',
+    color: 'text-[var(--spark)]',
+    description: 'See if it catches',
+    longDescription: 'A quick test or prototype to validate an idea before committing more time.'
+  },
+  learning: {
+    label: 'Torch',
+    color: 'text-[var(--primary)]',
+    description: 'Light the way',
+    longDescription: 'Knowledge acquisition - a skill, concept, or domain to explore and understand.'
+  },
 };
 
 export const EFFORT_CONFIG: Record<Effort, { label: string; description: string }> = {

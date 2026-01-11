@@ -34,6 +34,10 @@
   --exploring-bg: #f5f3fa;
   --building: #2d8a6e;       /* Forest green - growth, creation */
   --building-bg: #eef7f3;
+  --waiting: #d4a853;        /* Amber gold - on hold, waiting */
+  --waiting-bg: #fdf8ec;
+  --simmering: #8b7355;      /* Warm brown - slow simmer, background */
+  --simmering-bg: #f9f6f2;
   --shipped: #3d7ea6;        /* Ocean blue - arrival, completion */
   --shipped-bg: #eef5fa;
   --paused: #9c958b;         /* Warm gray - resting, dormant */
@@ -83,6 +87,10 @@
   --exploring-bg: #262330;
   --building: #3da882;
   --building-bg: #1f2d28;
+  --waiting: #e5b963;
+  --waiting-bg: #2d2820;
+  --simmering: #a68b6d;
+  --simmering-bg: #282420;
   --shipped: #4d96c4;
   --shipped-bg: #1f262d;
   --paused-bg: #262422;
@@ -111,6 +119,10 @@
     --exploring-bg: #262330;
     --building: #3da882;
     --building-bg: #1f2d28;
+    --waiting: #e5b963;
+    --waiting-bg: #2d2820;
+    --simmering: #a68b6d;
+    --simmering-bg: #282420;
     --shipped: #4d96c4;
     --shipped-bg: #1f262d;
     --paused-bg: #262422;

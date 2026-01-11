@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 
-type StageType = 'spark' | 'exploring' | 'building' | 'shipped' | 'paused' | 'permasolution';
+type StageType = 'spark' | 'exploring' | 'building' | 'waiting' | 'simmering' | 'shipped' | 'paused' | 'permasolution';
 
 interface StatsCardProps {
   label: string;
@@ -27,6 +27,16 @@ const stageStyles: Record<StageType, { color: string; bgColor: string; glowColor
     color: 'text-[var(--building)]',
     bgColor: 'bg-[var(--building-bg)]',
     glowColor: 'hover:shadow-[var(--building)]/20',
+  },
+  waiting: {
+    color: 'text-[var(--waiting)]',
+    bgColor: 'bg-[var(--waiting-bg)]',
+    glowColor: 'hover:shadow-[var(--waiting)]/20',
+  },
+  simmering: {
+    color: 'text-[var(--simmering)]',
+    bgColor: 'bg-[var(--simmering-bg)]',
+    glowColor: 'hover:shadow-[var(--simmering)]/20',
   },
   shipped: {
     color: 'text-[var(--shipped)]',

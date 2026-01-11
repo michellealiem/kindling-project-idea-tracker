@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Trash2, Sparkles, Zap, Flame, Lightbulb, CircleDot } from 'lucide-react';
+import { X, Trash2, Sparkles, Zap, Flame, Lightbulb, CircleDot, Calendar, Search, Clock } from 'lucide-react';
 import { Idea, Stage, IdeaType, Effort, STAGE_CONFIG, TYPE_CONFIG, EFFORT_CONFIG } from '@/lib/types';
 
 interface IdeaModalProps {
@@ -16,15 +16,17 @@ interface IdeaModalProps {
   aiSuggestion?: string | null;
 }
 
-const stages: Stage[] = ['spark', 'exploring', 'building', 'shipped', 'paused'];
+const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
 const types: IdeaType[] = ['permasolution', 'project', 'experiment', 'learning'];
 const efforts: Effort[] = ['trivial', 'small', 'medium', 'large', 'epic'];
 
-// Fire-themed stage icons: Spark → Kindling → Blazing → Beacon → Banked
+// Stage icons: Idea → Exploring → Active/Waiting/Simmering → Shipped → Paused
 const stageIcons: Record<Stage, typeof Zap> = {
   spark: Zap,
-  exploring: Flame,
+  exploring: Search,
   building: Flame,
+  waiting: Clock,
+  simmering: Flame,
   shipped: Lightbulb,
   paused: CircleDot,
 };
@@ -47,7 +49,15 @@ export function IdeaModal({
   const [tags, setTags] = useState('');
   const [effort, setEffort] = useState<Effort>('medium');
   const [notes, setNotes] = useState('');
+  const [startedAt, setStartedAt] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Get today's date in PST/California timezone
+  const getTodayPST = () => {
+    const now = new Date();
+    const pstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    return pstDate.toISOString().split('T')[0];
+  };
 
   // Reset form when modal opens/closes or idea changes
   useEffect(() => {
@@ -59,6 +69,8 @@ export function IdeaModal({
       setTags(idea.tags.join(', '));
       setEffort(idea.effort);
       setNotes(idea.notes);
+      // Convert ISO string to date input format (YYYY-MM-DD)
+      setStartedAt(idea.startedAt ? idea.startedAt.split('T')[0] : '');
     } else {
       setTitle('');
       setDescription('');
@@ -67,6 +79,8 @@ export function IdeaModal({
       setTags('');
       setEffort('medium');
       setNotes('');
+      // Auto-populate with today's date in PST
+      setStartedAt(getTodayPST());
     }
     setShowDeleteConfirm(false);
   }, [idea, isOpen]);
@@ -86,6 +100,7 @@ export function IdeaModal({
         .filter(Boolean),
       effort,
       notes: notes.trim(),
+      ...(startedAt && { startedAt: new Date(startedAt).toISOString() }),
     };
 
     if (idea) {
@@ -160,7 +175,7 @@ export function IdeaModal({
             />
           </div>
 
-          {/* Stage Selection - Visual Buttons */}
+          {/* Stage Selection - Visual Buttons with Tooltips */}
           <div>
             <label className="block text-sm font-medium text-[var(--foreground)] mb-3">
               Stage
@@ -171,21 +186,27 @@ export function IdeaModal({
                 const config = STAGE_CONFIG[s];
                 const isSelected = stage === s;
                 return (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setStage(s)}
-                    className={`
-                      flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                      ${isSelected
-                        ? `${config.bgColor} ${config.color} ring-2 ring-current`
-                        : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--border)]'
-                      }
-                    `}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {config.label}
-                  </button>
+                  <div key={s} className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => setStage(s)}
+                      className={`
+                        flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200
+                        ${isSelected
+                          ? `${config.bgColor} ${config.color} ring-2 ring-current`
+                          : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--border)]'
+                        }
+                        ${s === 'simmering' ? 'opacity-80' : ''}
+                      `}
+                    >
+                      <Icon className={`w-4 h-4 ${s === 'simmering' ? 'opacity-60' : ''}`} />
+                      {config.label}
+                    </button>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[var(--card)] border border-[var(--border)] rounded-lg text-xs text-[var(--muted-foreground)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                      {config.description}
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -217,6 +238,11 @@ export function IdeaModal({
                     <span className={`text-xs ${isSelected ? 'text-[var(--primary)]/70' : 'text-[var(--muted)]'}`}>
                       {config.description}
                     </span>
+                    {isSelected && (
+                      <span className="block mt-1.5 text-xs text-[var(--muted-foreground)] leading-relaxed">
+                        {config.longDescription}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -261,6 +287,27 @@ export function IdeaModal({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Started Date - for backdating old projects */}
+          <div>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[var(--muted)]" />
+                Started Date
+                <span className="text-[var(--muted)] font-normal">(optional)</span>
+              </div>
+            </label>
+            <p className="text-xs text-[var(--muted)] mb-2">
+              When did you actually start this? Useful for projects you forgot to add.
+            </p>
+            <input
+              type="date"
+              value={startedAt}
+              onChange={(e) => setStartedAt(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
+              className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
+            />
           </div>
 
           {/* Notes */}
