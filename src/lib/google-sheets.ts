@@ -20,9 +20,20 @@ function getAuth() {
     throw new Error('Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, and GOOGLE_SHEET_ID environment variables.');
   }
 
+  // Handle private key - Netlify may store it with literal \n or actual newlines
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY!;
+  // Replace literal \n with actual newlines (common when copying from JSON)
+  if (privateKey.includes('\\n')) {
+    privateKey = privateKey.replace(/\\n/g, '\n');
+  }
+  // Also handle case where it might be double-escaped
+  if (privateKey.includes('\\\\n')) {
+    privateKey = privateKey.replace(/\\\\n/g, '\n');
+  }
+
   const credentials = {
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
-    key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+    key: privateKey,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   };
 
