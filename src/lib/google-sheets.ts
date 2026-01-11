@@ -22,13 +22,18 @@ function getAuth() {
 
   // Handle private key - Netlify may store it with literal \n or actual newlines
   let privateKey = process.env.GOOGLE_PRIVATE_KEY!;
-  // Replace literal \n with actual newlines (common when copying from JSON)
-  if (privateKey.includes('\\n')) {
-    privateKey = privateKey.replace(/\\n/g, '\n');
-  }
-  // Also handle case where it might be double-escaped
-  if (privateKey.includes('\\\\n')) {
-    privateKey = privateKey.replace(/\\\\n/g, '\n');
+
+  // Try multiple replacement strategies for the newlines
+  // Strategy 1: Replace literal backslash-n (most common from JSON copy)
+  privateKey = privateKey.split('\\n').join('\n');
+
+  // Strategy 2: If still has issues, try replacing escaped backslash
+  privateKey = privateKey.split('\\\\n').join('\n');
+
+  // Strategy 3: Remove any surrounding quotes that Netlify might have added
+  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+    privateKey = privateKey.slice(1, -1);
+    privateKey = privateKey.split('\\n').join('\n');
   }
 
   const credentials = {
