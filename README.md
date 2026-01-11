@@ -1,4 +1,4 @@
-# Idea Forge
+# Kindling
 
 A personal project/idea tracker that helps you move ideas from spark to shipped.
 

@@ -1,8 +1,9 @@
-// localStorage wrapper for Idea Forge data
+// localStorage wrapper for Kindling data
 
 import { AppData, Idea, Theme, Learning } from './types';
 
-const STORAGE_KEY = 'idea-forge-data';
+const STORAGE_KEY = 'kindling-data';
+const LEGACY_STORAGE_KEY = 'idea-forge-data';
 
 const DEFAULT_DATA: AppData = {
   version: '1.0',
@@ -20,7 +21,19 @@ export function getData(): AppData {
   if (typeof window === 'undefined') return DEFAULT_DATA;
 
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    let stored = localStorage.getItem(STORAGE_KEY);
+
+    // Migrate from legacy storage key if needed
+    if (!stored) {
+      const legacyStored = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacyStored) {
+        // Migrate data to new key
+        localStorage.setItem(STORAGE_KEY, legacyStored);
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+        stored = legacyStored;
+      }
+    }
+
     if (!stored) return DEFAULT_DATA;
 
     const parsed = JSON.parse(stored) as AppData;
@@ -138,7 +151,7 @@ export function downloadData(data: AppData): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `idea-forge-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.download = `kindling-backup-${new Date().toISOString().split('T')[0]}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

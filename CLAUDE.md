@@ -1,8 +1,8 @@
-# Idea Forge - Project Instructions
+# Kindling - Project Instructions
 
 ## Project Overview
 
-**Idea Forge** is a personal project/idea tracker for Michelle. It tracks ideas through stages: Spark → Exploring → Building → Shipped → Paused.
+**Kindling** is a personal project/idea tracker for Michelle. It tracks ideas through stages: Spark → Exploring → Building → Shipped → Paused.
 
 **Key Concepts:**
 - **Permasolution**: Build once, runs forever (no ongoing maintenance)
