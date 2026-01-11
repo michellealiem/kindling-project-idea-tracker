@@ -42,28 +42,6 @@ function parsePrivateKey(rawKey: string): string {
   return key;
 }
 
-// Debug function to help diagnose key format issues
-export function debugKeyFormat(): {
-  hasKey: boolean;
-  keyLength: number;
-  startsWithBegin: boolean;
-  hasNewlines: boolean;
-  firstChars: string;
-  lastChars: string;
-} {
-  const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
-  const parsedKey = rawKey ? parsePrivateKey(rawKey) : '';
-
-  return {
-    hasKey: !!rawKey,
-    keyLength: rawKey.length,
-    startsWithBegin: parsedKey.startsWith('-----BEGIN'),
-    hasNewlines: parsedKey.includes('\n'),
-    firstChars: parsedKey.substring(0, 30).replace(/\n/g, '\\n'),
-    lastChars: parsedKey.substring(parsedKey.length - 30).replace(/\n/g, '\\n'),
-  };
-}
-
 // Initialize auth - uses service account credentials
 function getAuth() {
   if (!isGoogleSheetsConfigured()) {
