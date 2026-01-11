@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-10-D] - Matchstick Favicon
+
+### Changed
+- Replaced default favicon (black circle with white triangle) with custom matchstick design
+- New favicon features a lit match with warm orange/yellow flame - fits the Kindling fire theme
+
+### Added
+- `src/app/icon.svg` - SVG matchstick favicon (scales crisp at any size)
+
+### Removed
+- `src/app/favicon.ico` - Old default favicon
+
+---
+
 ## [2026-01-10-C] - GitHub & Netlify Setup
 
 ### Added

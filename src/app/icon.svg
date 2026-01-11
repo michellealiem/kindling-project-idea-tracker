@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Match stick -->
+  <rect x="14" y="14" width="4" height="16" rx="1" fill="#8B4513"/>
+
+  <!-- Match head (unlit part) -->
+  <rect x="13" y="11" width="6" height="4" rx="1" fill="#C41E3A"/>
+
+  <!-- Flame - outer glow -->
+  <ellipse cx="16" cy="6" rx="6" ry="7" fill="#FF6B35" opacity="0.6"/>
+
+  <!-- Flame - main -->
+  <path d="M16 1 C12 5 11 8 13 11 C14 9 15 8 16 9 C17 8 18 9 19 11 C21 8 20 5 16 1Z" fill="#FF9500"/>
+
+  <!-- Flame - inner bright -->
+  <path d="M16 4 C14 6 13.5 8 14.5 10 C15 9 15.5 8.5 16 9 C16.5 8.5 17 9 17.5 10 C18.5 8 18 6 16 4Z" fill="#FFD93D"/>
+</svg>
