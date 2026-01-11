@@ -8,6 +8,10 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Next.js on Netlify plugin
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
 # Security headers
 [[headers]]
   for = "/*"
