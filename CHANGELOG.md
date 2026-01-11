@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-E] - Timeline Improvements
+
+### Changed
+
+**Milestone-Only Events:**
+- Timeline now shows only the first time an idea enters each stage
+- Eliminates noise from repeated back-and-forth transitions (e.g., Active → Waiting → Active)
+- Provides cleaner view of actual project progression
+
+**Collapsible Date Sections:**
+- Last 7 days of events remain fully expanded by default
+- Older date sections are collapsed with click-to-expand
+- Chevron indicators show expand/collapse state for older dates
+
+### Files Modified
+- `src/app/timeline/page.tsx` - Milestone filtering and collapsible sections
+
+---
+
 ## [2026-01-11-D] - UX Improvements & Category Refinement
 
 ### Changed
@@ -302,4 +321,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11D
+**Last Updated:** 2026-01-11E
