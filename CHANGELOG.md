@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-B] - Browser Title Update
+
+### Changed
+- Updated browser tab title from "Kindling | Where Ideas Catch Fire" to "Kindling | Ideas & Projects"
+
+### Files Modified
+- `src/app/layout.tsx` - Updated metadata title
+
+---
+
 ## [2026-01-11-A] - Google Sheets Integration
 
 ### Added
@@ -211,4 +221,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11A
+**Last Updated:** 2026-01-11B

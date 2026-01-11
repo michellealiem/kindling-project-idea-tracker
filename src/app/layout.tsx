@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Kindling | Where Ideas Catch Fire',
+  title: 'Kindling | Ideas & Projects',
   description: 'Track your ideas from spark to shipped. Build to explore.',
 };
 
