@@ -122,7 +122,19 @@ export function addLearning(data: AppData, learning: Omit<Learning, 'id'>): AppD
 
 // Export/Import
 export function exportData(data: AppData): string {
-  return JSON.stringify(data, null, 2);
+  // Validate structure before export to prevent malformed JSON
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid data structure');
+  }
+  if (!Array.isArray(data.ideas)) {
+    throw new Error('Ideas must be an array');
+  }
+  // Limit export size to prevent memory issues (10MB limit)
+  const json = JSON.stringify(data, null, 2);
+  if (json.length > 10 * 1024 * 1024) {
+    throw new Error('Data too large to export');
+  }
+  return json;
 }
 
 export function importData(jsonString: string): AppData | null {

@@ -81,8 +81,9 @@ export function AuthGate({ children }: AuthGateProps) {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.slice(0, 256))}
               placeholder="Enter password"
+              maxLength={256}
               className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
               autoFocus
               disabled={isLoading}

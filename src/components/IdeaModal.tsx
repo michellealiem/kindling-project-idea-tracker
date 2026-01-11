@@ -31,6 +31,15 @@ const stageIcons: Record<Stage, typeof Zap> = {
   paused: CircleDot,
 };
 
+// Sanitize AI-generated text to remove control characters and trim excessive length
+function sanitizeAIText(text: string | null | undefined): string {
+  if (!text) return '';
+  // Remove control characters (except newlines/tabs), limit length
+  return text
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    .slice(0, 5000);
+}
+
 export function IdeaModal({
   idea,
   isOpen,
@@ -424,11 +433,11 @@ export function IdeaModal({
                     <span className="text-sm font-medium text-[var(--foreground)]">AI Suggestions</span>
                   </div>
                   <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap leading-relaxed">
-                    {aiSuggestion}
+                    {sanitizeAIText(aiSuggestion)}
                   </p>
                   <button
                     type="button"
-                    onClick={() => setNotes(prev => prev ? `${prev}\n\n---\nAI Suggestion:\n${aiSuggestion}` : `AI Suggestion:\n${aiSuggestion}`)}
+                    onClick={() => setNotes(prev => prev ? `${prev}\n\n---\nAI Suggestion:\n${sanitizeAIText(aiSuggestion)}` : `AI Suggestion:\n${sanitizeAIText(aiSuggestion)}`)}
                     className="mt-3 text-xs text-[var(--primary)] hover:underline font-medium"
                   >
                     + Add to notes

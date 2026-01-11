@@ -55,9 +55,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
     console.error('Failed to create idea:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isDev = process.env.NODE_ENV === 'development';
+    const errorMessage = isDev && error instanceof Error ? error.message : undefined;
     return NextResponse.json(
-      { error: 'Failed to create idea', details: errorMessage },
+      { error: 'Failed to create idea', ...(errorMessage && { details: errorMessage }) },
       { status: 500 }
     );
   }

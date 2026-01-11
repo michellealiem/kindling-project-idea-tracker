@@ -6,7 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [2026-01-11-H] - Security Hardening
+## [2026-01-11-I] - Security Hardening (Medium Priority)
+
+### Added
+
+**Security Headers** (`next.config.ts`)
+- Content Security Policy (CSP) restricting script/style/connect sources
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- X-XSS-Protection: 1; mode=block
+- Referrer-Policy: strict-origin-when-cross-origin
+
+### Fixed
+
+**Input Sanitization:**
+- AI suggestions now sanitized before display (control chars removed, 5KB limit)
+- Password field limited to 256 characters in AuthGate UI
+- Export data validated and size-limited (10MB max)
+
+**Error Message Verbosity:**
+- API error details now hidden in production (only shown in development)
+- Prevents information disclosure to potential attackers
+
+### Files Modified
+- `next.config.ts` - Security headers and CSP
+- `src/components/IdeaModal.tsx` - AI suggestion sanitization
+- `src/components/AuthGate.tsx` - Password input length limit
+- `src/lib/storage.ts` - Export validation and size limits
+- `src/app/api/ideas/route.ts` - Production error masking
+- `src/app/api/data/route.ts` - Production error masking
+
+---
+
+## [2026-01-11-H] - Security Hardening (Critical)
 
 ### Fixed
 
@@ -387,4 +419,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11H
+**Last Updated:** 2026-01-11I

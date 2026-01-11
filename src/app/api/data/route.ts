@@ -30,9 +30,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to fetch data:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isDev = process.env.NODE_ENV === 'development';
+    const errorMessage = isDev && error instanceof Error ? error.message : undefined;
     return NextResponse.json(
-      { error: 'Failed to fetch data', details: errorMessage },
+      { error: 'Failed to fetch data', ...(errorMessage && { details: errorMessage }) },
       { status: 500 }
     );
   }
