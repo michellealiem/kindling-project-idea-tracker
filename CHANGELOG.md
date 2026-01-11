@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-H] - Security Hardening
+
+### Fixed
+
+**Critical Security Issues Resolved:**
+
+1. **Authentication Hardening** (`src/app/api/auth/route.ts`)
+   - Replaced plain string comparison with `crypto.timingSafeEqual()` to prevent timing attacks
+   - Added rate limiting: 5 attempts per IP, 15-minute lockout after exceeded
+   - Limited password input to 256 characters to prevent DoS via large payloads
+   - Changed `sameSite` cookie attribute from `lax` to `strict` for better CSRF protection
+   - Added proper error handling for malformed requests
+
+2. **API Authentication** (`src/app/api/data/route.ts`)
+   - Added authentication check to GET endpoint (was previously unprotected)
+   - Added authentication check to POST `/api/data` endpoint (sheet initialization)
+   - Both endpoints now require valid `kindling_auth` cookie when `SITE_PASSWORD` is set
+
+### Security Review Summary
+- Conducted full codebase security audit
+- Verified `.env.local` is properly gitignored (never committed)
+- Identified and fixed 3 critical vulnerabilities
+
+### Files Modified
+- `src/app/api/auth/route.ts` - Rate limiting, timing-safe comparison, input validation
+- `src/app/api/data/route.ts` - Added authentication checks to GET and POST
+
+---
+
 ## [2026-01-11-G] - Google Sheets Sync Fix (Complete)
 
 ### Fixed
@@ -358,4 +387,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11G
+**Last Updated:** 2026-01-11H
