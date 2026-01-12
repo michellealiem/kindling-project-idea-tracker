@@ -35,11 +35,16 @@ export function DroppableColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`w-64 sm:w-72 lg:w-80 flex-shrink-0 rounded-2xl p-3 sm:p-4 flex flex-col border transition-all duration-200 ${
+      className={`w-64 sm:w-72 lg:w-80 flex-shrink-0 rounded-2xl p-3 sm:p-4 flex flex-col border-2 transition-all duration-200 ${
         isOver
           ? 'border-[var(--primary)] bg-[var(--primary)]/5 shadow-lg shadow-[var(--primary)]/10'
-          : 'border-[var(--border)] bg-[var(--background)]'
+          : 'border-transparent bg-[var(--background)]'
       }`}
+      style={{
+        borderTopColor: isOver ? undefined : `var(--${stage}-border)`,
+        borderTopWidth: isOver ? undefined : '3px',
+        backgroundImage: isOver ? undefined : `linear-gradient(to bottom, var(--${stage}-bg) 0%, var(--background) 100px)`
+      }}
     >
       {/* Column Header */}
       <div className="flex items-center justify-between mb-4">

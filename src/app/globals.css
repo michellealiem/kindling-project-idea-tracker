@@ -27,21 +27,28 @@
   --muted-foreground: #5a544b;  /* Darker for better contrast */
   --border: #e5e1db;
 
-  /* Stage colors - A journey from spark to completion */
-  --spark: #e07b39;          /* Warm ember orange - the initial fire */
-  --spark-bg: #fef3eb;
-  --exploring: #7c6fb0;      /* Dusty violet - curiosity, wonder */
-  --exploring-bg: #f5f3fa;
-  --building: #2d8a6e;       /* Forest green - growth, creation */
-  --building-bg: #eef7f3;
-  --waiting: #d4a853;        /* Amber gold - on hold, waiting */
-  --waiting-bg: #fdf8ec;
-  --simmering: #8b7355;      /* Warm brown - slow simmer, background */
-  --simmering-bg: #f9f6f2;
-  --shipped: #3d7ea6;        /* Ocean blue - arrival, completion */
-  --shipped-bg: #eef5fa;
-  --paused: #9c958b;         /* Warm gray - resting, dormant */
-  --paused-bg: #f7f6f4;
+  /* Stage colors - Color temperature progression (cool spark → warm action → cool completion) */
+  --spark: #8b5cf6;          /* Violet - cool potential energy, the initial spark */
+  --spark-bg: #faf5ff;
+  --spark-border: #8b5cf6;
+  --exploring: #f59e0b;      /* Amber - warm glow, gathering kindling */
+  --exploring-bg: #fffbeb;
+  --exploring-border: #f59e0b;
+  --building: #fb923c;       /* Orange - bright flame, active creation */
+  --building-bg: #fff7ed;
+  --building-border: #fb923c;
+  --waiting: #e11d48;        /* Rose - muted ember, banked coals */
+  --waiting-bg: #fff1f2;
+  --waiting-border: #e11d48;
+  --simmering: #991b1b;      /* Deep red - low fire, slow simmer */
+  --simmering-bg: #fef2f2;
+  --simmering-border: #991b1b;
+  --shipped: #10b981;        /* Emerald - satisfying completion, warmth radiating */
+  --shipped-bg: #f0fdf4;
+  --shipped-border: #10b981;
+  --paused: #64748b;         /* Slate - desaturated gray, covered fire */
+  --paused-bg: #f8fafc;
+  --paused-border: #64748b;
 
   /* Special */
   --permasolution: #c9a227;  /* Antique gold - lasting value */
@@ -81,19 +88,27 @@
   --primary: #14a3a8;
   --primary-light: #1ab8be;
   --primary-dark: #0e8588;
-  --spark: #f08d4a;
-  --spark-bg: #2d2520;
-  --exploring: #9488c7;
-  --exploring-bg: #262330;
-  --building: #3da882;
-  --building-bg: #1f2d28;
-  --waiting: #e5b963;
-  --waiting-bg: #2d2820;
-  --simmering: #a68b6d;
-  --simmering-bg: #282420;
-  --shipped: #4d96c4;
-  --shipped-bg: #1f262d;
-  --paused-bg: #262422;
+  --spark: #a78bfa;
+  --spark-bg: #1e1b4b;
+  --spark-border: #a78bfa;
+  --exploring: #fbbf24;
+  --exploring-bg: #422006;
+  --exploring-border: #fbbf24;
+  --building: #fb923c;
+  --building-bg: #431407;
+  --building-border: #fb923c;
+  --waiting: #fb7185;
+  --waiting-bg: #4c0519;
+  --waiting-border: #fb7185;
+  --simmering: #dc2626;
+  --simmering-bg: #450a0a;
+  --simmering-border: #dc2626;
+  --shipped: #34d399;
+  --shipped-bg: #022c22;
+  --shipped-border: #34d399;
+  --paused: #94a3b8;
+  --paused-bg: #1e293b;
+  --paused-border: #94a3b8;
   --permasolution-bg: #2d2820;
 }
 
@@ -113,19 +128,27 @@
     --primary: #14a3a8;
     --primary-light: #1ab8be;
     --primary-dark: #0e8588;
-    --spark: #f08d4a;
-    --spark-bg: #2d2520;
-    --exploring: #9488c7;
-    --exploring-bg: #262330;
-    --building: #3da882;
-    --building-bg: #1f2d28;
-    --waiting: #e5b963;
-    --waiting-bg: #2d2820;
-    --simmering: #a68b6d;
-    --simmering-bg: #282420;
-    --shipped: #4d96c4;
-    --shipped-bg: #1f262d;
-    --paused-bg: #262422;
+    --spark: #a78bfa;
+    --spark-bg: #1e1b4b;
+    --spark-border: #a78bfa;
+    --exploring: #fbbf24;
+    --exploring-bg: #422006;
+    --exploring-border: #fbbf24;
+    --building: #fb923c;
+    --building-bg: #431407;
+    --building-border: #fb923c;
+    --waiting: #fb7185;
+    --waiting-bg: #4c0519;
+    --waiting-border: #fb7185;
+    --simmering: #dc2626;
+    --simmering-bg: #450a0a;
+    --simmering-border: #dc2626;
+    --shipped: #34d399;
+    --shipped-bg: #022c22;
+    --shipped-border: #34d399;
+    --paused: #94a3b8;
+    --paused-bg: #1e293b;
+    --paused-border: #94a3b8;
     --permasolution-bg: #2d2820;
   }
 }

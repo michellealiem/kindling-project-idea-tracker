@@ -44,7 +44,11 @@ export function IdeaCard({ idea, onClick, compact = false }: IdeaCardProps) {
     return (
       <button
         onClick={() => onClick(idea)}
-        className={`w-full text-left p-3 bg-[var(--card)] rounded-xl border border-[var(--border)] hover:border-[var(--primary)]/30 card-hover group ${isSpark ? 'animate-spark-glow' : ''}`}
+        className={`w-full text-left p-3 bg-[var(--card)] rounded-xl border border-[var(--border)] hover:border-[var(--primary)]/30 card-hover group ${isSpark ? 'animate-spark-glow' : ''} border-l-3`}
+        style={{
+          borderLeftColor: `var(--${idea.stage}-border)`,
+          backgroundImage: `linear-gradient(to right, var(--${idea.stage}-bg) 0%, transparent 20%)`
+        }}
       >
         <div className="flex items-center gap-2 mb-1.5">
           <StageIcon className={`w-3.5 h-3.5 ${stageConfig.color}`} />
@@ -65,7 +69,11 @@ export function IdeaCard({ idea, onClick, compact = false }: IdeaCardProps) {
   return (
     <button
       onClick={() => onClick(idea)}
-      className={`w-full text-left p-5 bg-[var(--card)] rounded-2xl border border-[var(--border)] card-hover group animate-fade-up ${isSpark ? 'hover:animate-spark-glow' : ''} ${isShipped ? 'hover:animate-celebrate' : ''}`}
+      className={`w-full text-left p-5 bg-[var(--card)] rounded-2xl border border-[var(--border)] card-hover group animate-fade-up ${isSpark ? 'hover:animate-spark-glow' : ''} ${isShipped ? 'hover:animate-celebrate' : ''} border-l-4 border-l-[var(--${idea.stage}-border)] bg-gradient-to-r from-[var(--${idea.stage}-bg)] to-transparent`}
+      style={{
+        borderLeftColor: `var(--${idea.stage}-border)`,
+        backgroundImage: `linear-gradient(to right, var(--${idea.stage}-bg) 0%, transparent 15%)`
+      }}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">

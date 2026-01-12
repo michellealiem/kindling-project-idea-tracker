@@ -6,6 +6,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-12-A] - Color Temperature System & Kanban Layout Mockups
+
+### Added
+
+**Color Temperature Progression:**
+- Implemented intentional color temperature system for stage identification
+- Stage colors follow fire metaphor from cool spark → warm action → cool completion:
+  - **Spark/Idea** → Violet (#8b5cf6) - Cool potential energy, the initial spark
+  - **Exploring** → Amber (#f59e0b) - Warm glow, gathering kindling
+  - **Building/Active** → Orange (#fb923c) - Bright flame, active creation
+  - **Waiting** → Rose (#e11d48) - Muted ember, banked coals
+  - **Simmering** → Deep Red (#991b1b) - Low fire, slow simmer
+  - **Shipped** → Emerald (#10b981) - Satisfying completion, warmth radiating
+  - **Paused** → Slate (#64748b) - Desaturated gray, covered fire
+- Cards now feature 3-4px left border accent in stage color
+- Subtle background gradient (5-15% opacity) from stage color
+- Kanban columns have colored top borders matching their stage
+- Full dark mode support with adjusted brightness
+
+**Kanban Layout Mockups:**
+- Created `/kanban-layouts` experimental page with 4 different layout approaches
+- Layout switcher to compare options side-by-side
+- **Option 1: Collapsible Columns** - Click to collapse/expand individual columns to reduce horizontal scrolling
+- **Option 2: Swimlane View** - Horizontal rows instead of vertical columns, no board scrolling needed
+- **Option 3: Grouped Hybrid** - Stages grouped into Ideation/In Progress/Complete categories
+- **Option 4: Responsive Widths** - Empty columns shrink, Active column expands, dynamic sizing
+
+### Changed
+- All idea cards now show stage via color temperature instead of just text labels
+- Enhanced visual hierarchy makes stage identification instant and intuitive
+- Color system works cohesively with existing fire theme
+
+### Files Created
+- `src/app/kanban-layouts/page.tsx` - Layout comparison playground
+
+### Files Modified
+- `src/app/globals.css` - Added color temperature CSS variables for all stages (light + dark mode)
+- `src/components/IdeaCard.tsx` - Added left border accent and gradient background
+- `src/components/DroppableColumn.tsx` - Added colored top border and gradient to columns
+
+### Design Notes
+- Color temperature system reduces visual clutter while improving information density
+- Collapsible columns layout identified as preferred approach for main Kanban board
+- Dashboard improvements deferred for future iteration
+
+---
+
 ## [2026-01-11-L] - Password Documentation
 
 ### Added
