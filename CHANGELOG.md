@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-11-L] - Password Documentation
+
+### Added
+- Documented that `SITE_PASSWORD` must be set in `.env` file for local development
+- Password is required to access the deployed app; stored locally, not in git
+
+---
+
 ## [2026-01-11-K] - Timeline Delete & UI Polish
 
 ### Added
@@ -485,4 +493,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-**Last Updated:** 2026-01-11J
+**Last Updated:** 2026-01-11L
