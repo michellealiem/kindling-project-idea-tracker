@@ -6,6 +6,169 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-12-B] - PAIA Integration Architecture Brainstorming
+
+### Context
+Brainstorming session for integrating Kindling with PAIA (Personal AI Assistant) to create a "web of projects within memory framework." Goal: Make Kindling leverage PAIA's recurring themes, learnings, and RSS content to surface context automatically and reveal blindspots.
+
+### Creative Ideas Explored (20 total)
+
+**Most Creative (ranked):**
+1. Dream Synthesis Engine - Auto-generate project ideas from theme gaps
+2. Emotional Energy Mapper - Track journal sentiment to auto-update project priority
+3. Ghost Collaborator Mode - Virtual Board of Directors advisory on each card
+4. Temporal Resonance View - Show how current projects rhyme with past patterns
+5. Context Constellation - Dynamic memory cloud around each idea
+6. Builder-Sustainer Prediction AI - Predict maintenance burden before starting
+7. Idea Pollination System - Cross-pollinate insights across unrelated projects
+8. Memory-Triggered Insights - Real-time relevant memories while working
+9. Future Self Dialogue - AI-generated advice from past patterns
+10. Serendipity Engine - Random unexpected connections for inspiration
+
+**Most Practical (ranked):**
+1. Auto-Tag from Themes - Suggest tags from recurring_themes.md
+2. Smart Card Population - Auto-fill fields based on past projects
+3. Learnings-to-Cards Pipeline - One-click add learnings to relevant cards
+4. Automatic Stage Detection - Auto-move cards based on PAIA conversations
+5. Contextual Note Suggestions - Surface relevant memory snippets
+6. Theme Dashboard Integration - Live theme counts, show focus imbalance
+7. Pre-Filled Project Templates - Smart defaults from past similar projects
+8. Effort Estimation Assistant - AI-calibrated effort suggestions
+9. Related Cards Auto-Linking - Detect overlapping projects
+10. Weekly Sync Summary - Digest of activity + patterns
+
+### Recommended MVP (Phase 1)
+After utility analysis, narrowed to **3 high-value, low-complexity features**:
+
+1. **Auto-Tag from Themes** (1-2 hours)
+   - Parse recurring_themes.md, suggest tags on idea creation
+   - Solves: Manual tagging overhead
+
+2. **Theme Gap Dashboard** (2 hours)
+   - Show project count per theme (e.g., "8 automation, 0 clinical education")
+   - Solves: "Am I walking my talk?" blindspot
+
+3. **RSS Resource Linking** (3-4 hours)
+   - Surface high-scoring YouTube/podcast content saved in PAIA
+   - Match to Kindling cards by tags/description
+   - Solves: "I forgot I already found this resource" + "Context at point of need"
+
+**Total effort: 6-8 hours | Maintenance: Near-zero (file-based)**
+
+### RSS Integration Deep Dive
+
+**Problem Identified:**
+- PAIA RSS skill fetches YouTube/podcasts but doesn't persist them
+- High-value content gets lost after viewing
+- User forgets resources exist when starting related projects
+
+**Two-Part Solution:**
+
+**Part 1: PAIA Enhancement (not Kindling work)**
+- Add persistence: Save high-scoring items to `scored_content.json`
+- Implement scoring system (manual save or auto-save 8+ rated)
+- Auto-tag with Ollama (extract keywords from title/description)
+- Store metadata: title, URL, score, tags, user notes
+
+**Part 2: Kindling Integration**
+- Read `scored_content.json` from PAIA directory
+- Match resources to ideas via tag overlap + keyword similarity
+- Display "Related Resources" panel on card detail view
+- Show only 7.5+ scored items, top 3-5 most relevant
+- Quick actions: Open link, add to notes
+
+**Data Flow:**
+```
+User reviews RSS in PAIA (Telegram/Claude Code)
+  ↓
+Scores/saves high-value items
+  ↓
+PAIA writes to scored_content.json with auto-tags
+  ↓
+Kindling reads file on sync
+  ↓
+Matches resources to ideas
+  ↓
+Surfaces at point of need on cards
+```
+
+**Permasolution Status:** ✅
+- File-based (no database)
+- Ollama auto-tags (no manual work)
+- Offline-capable
+- Zero ongoing maintenance
+
+### Key Design Decisions
+
+**Architecture Choice: File-Based (No IndexedDB)**
+- PAIA is pure markdown - keep it that way
+- Kindling reads files directly (like current theme parser)
+- No graph database needed (was over-engineering)
+
+**Utility Filter Applied:**
+- 70% of creative ideas deemed "cool but not useful"
+- 30% solve actual blindspots (auto-tag, theme gaps, RSS linking)
+- Focus on reducing manual work and revealing patterns
+
+**Core Blindspots Being Solved:**
+- Problem A: "I keep forgetting good resources I already found"
+- Problem B: "I want context when starting projects" (auto-surfacing)
+- Problem C: "My projects don't align with my stated themes"
+- Problem D: "I'm working on too many similar things" (duplicate detection)
+
+### Outstanding Planning Questions
+
+**Before Building - Need User Input:**
+
+1. **PAIA RSS Persistence:**
+   - Does RSS skill already score content 1-10, or add this?
+   - Save trigger: Manual "save this" command vs auto-save if watched >50%?
+   - Tag strategy: Trust Ollama fully or allow manual editing?
+
+2. **RSS Consumption Pattern:**
+   - How many items reviewed per day/week?
+   - How many are "save-worthy"?
+   - Current interaction flow in Telegram/Claude Code?
+
+3. **Rediscovery Behavior:**
+   - Do you actively search for resources when starting projects?
+   - Or prefer automatic surfacing without asking?
+   - Would auto-suggestions feel helpful or noisy?
+
+4. **Broader Vision:**
+   - Is Kindling becoming a "project + research hub"?
+   - Or more "let past learning resurface when relevant"?
+   - Should it show ALL saved resources or only project-matched ones?
+
+5. **Build Order:**
+   - Start with PAIA persistence first, then Kindling integration?
+   - Or mock RSS data in Kindling to prove UX first?
+
+### Next Steps
+
+**Phase 1 (PAIA work):**
+1. Add persistence to RSS skill (scored_content.json)
+2. Implement save/score mechanism
+3. Add Ollama auto-tagging
+
+**Phase 2 (Kindling work):**
+1. Build auto-tag from themes
+2. Build theme gap dashboard
+3. Build RSS resource matching + UI
+
+**Decision Point:** User to confirm Phase 1 approach before building.
+
+### Files Modified
+- None (brainstorming only)
+
+### Technical Notes
+- All features maintain permasolution principle (no maintenance burden)
+- File-based architecture leverages existing PAIA structure
+- Ollama integration already proven in Kindling chatbot
+- Simple text matching sufficient for MVP (embeddings optional for v2)
+
+---
+
 ## [2026-01-12-A] - Color Temperature System & Kanban Layout Mockups
 
 ### Added
