@@ -1,7 +1,7 @@
 'use client';
 
-import { Idea, Stage, STAGE_CONFIG, TYPE_CONFIG } from '@/lib/types';
-import { Shield, Clock, Tag, Zap, Flame, Lightbulb, CircleDot, Crown, Search, LucideIcon } from 'lucide-react';
+import { Idea, Stage, STAGE_CONFIG } from '@/lib/types';
+import { Clock, Tag, Zap, Flame, Lightbulb, CircleDot, Crown, Search, LucideIcon } from 'lucide-react';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -22,7 +22,6 @@ const stageIcons: Record<Stage, LucideIcon> = {
 
 export function IdeaCard({ idea, onClick, compact = false }: IdeaCardProps) {
   const stageConfig = STAGE_CONFIG[idea.stage];
-  const typeConfig = TYPE_CONFIG[idea.type];
   const isPermasolution = idea.type === 'permasolution';
   const isSpark = idea.stage === 'spark';
   const isShipped = idea.stage === 'shipped';
@@ -114,31 +113,25 @@ export function IdeaCard({ idea, onClick, compact = false }: IdeaCardProps) {
         </p>
       )}
 
-      {/* Footer: Type & Tags */}
-      <div className="flex items-center flex-wrap gap-2 pt-2 border-t border-[var(--border)]">
-        <span className={`text-xs ${typeConfig.color} font-medium`}>
-          {typeConfig.label}
-        </span>
-
-        {idea.tags.length > 0 && (
-          <span className="text-[var(--border)]">•</span>
-        )}
-
-        {idea.tags.slice(0, 2).map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-md text-xs"
-          >
-            <Tag className="w-2.5 h-2.5" />
-            {tag}
-          </span>
-        ))}
-        {idea.tags.length > 2 && (
-          <span className="text-xs text-[var(--muted-foreground)]">
-            +{idea.tags.length - 2}
-          </span>
-        )}
-      </div>
+      {/* Footer: Tags */}
+      {idea.tags.length > 0 && (
+        <div className="flex items-center flex-wrap gap-2 pt-2 border-t border-[var(--border)]">
+          {idea.tags.slice(0, 2).map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-md text-xs"
+            >
+              <Tag className="w-2.5 h-2.5" />
+              {tag}
+            </span>
+          ))}
+          {idea.tags.length > 2 && (
+            <span className="text-xs text-[var(--muted-foreground)]">
+              +{idea.tags.length - 2}
+            </span>
+          )}
+        </div>
+      )}
     </button>
   );
 }

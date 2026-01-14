@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Trash2, Sparkles, Zap, Flame, Lightbulb, CircleDot, Calendar, Search, Clock } from 'lucide-react';
-import { Idea, Stage, IdeaType, Effort, STAGE_CONFIG, TYPE_CONFIG, EFFORT_CONFIG } from '@/lib/types';
+import { Idea, Stage, IdeaType, Effort, STAGE_CONFIG, EFFORT_CONFIG } from '@/lib/types';
 
 interface IdeaModalProps {
   idea: Idea | null;
@@ -17,7 +17,7 @@ interface IdeaModalProps {
 }
 
 const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
-const types: IdeaType[] = ['learning', 'experiment', 'project', 'permasolution'];
+const types: IdeaType[] = ['learning', 'experiment', 'project', 'permasolution']; // Still needed for AI categorization
 const efforts: Effort[] = ['trivial', 'small', 'medium', 'large', 'epic'];
 
 // Stage icons: Idea → Exploring → Active/Waiting/Simmering → Shipped → Paused
@@ -284,43 +284,6 @@ export function IdeaModal({
                       {config.description}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Type Selection */}
-          <div>
-            <label className="block text-sm font-medium text-[var(--foreground)] mb-3">
-              Type
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {types.map((t) => {
-                const config = TYPE_CONFIG[t];
-                const isSelected = type === t;
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setType(t)}
-                    className={`
-                      px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-left
-                      ${isSelected
-                        ? `bg-[var(--primary)]/10 text-[var(--primary)] ring-2 ring-[var(--primary)]`
-                        : 'bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--border)]'
-                      }
-                    `}
-                  >
-                    <span className="block font-semibold">{config.label}</span>
-                    <span className={`text-xs ${isSelected ? 'text-[var(--primary)]/70' : 'text-[var(--muted)]'}`}>
-                      {config.description}
-                    </span>
-                    {isSelected && (
-                      <span className="block mt-1.5 text-xs text-[var(--muted-foreground)] leading-relaxed">
-                        {config.longDescription}
-                      </span>
-                    )}
-                  </button>
                 );
               })}
             </div>

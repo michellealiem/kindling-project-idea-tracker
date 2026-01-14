@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -15,12 +15,18 @@ import {
 } from '@dnd-kit/core';
 import { useApp } from '@/components/AppProvider';
 import { DroppableColumn } from '@/components/DroppableColumn';
+import { ActiveColumn } from '@/components/ActiveColumn';
 import { IdeaCard } from '@/components/IdeaCard';
 import { SearchBar } from '@/components/SearchBar';
 import { Stage } from '@/lib/types';
 import { Flame } from 'lucide-react';
 
-const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
+// Simple columns (not combined)
+const simpleStages: Stage[] = ['spark', 'exploring', 'shipped', 'paused'];
+// Combined "Active" stages shown with tabs
+const activeStages: Stage[] = ['building', 'waiting', 'simmering'];
+// All stages for collision detection
+const allStages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
 
 // Custom collision detection that prioritizes column drops
 // Uses pointerWithin first (more forgiving), falls back to rectIntersection
@@ -30,7 +36,7 @@ const customCollisionDetection: CollisionDetection = (args) => {
 
   // Filter to only include stage columns (not cards)
   const columnCollisions = pointerCollisions.filter(
-    collision => stages.includes(collision.id as Stage)
+    collision => allStages.includes(collision.id as Stage)
   );
 
   if (columnCollisions.length > 0) {
@@ -40,7 +46,7 @@ const customCollisionDetection: CollisionDetection = (args) => {
   // Fall back to rect intersection with all droppables
   const rectCollisions = rectIntersection(args);
   const columnRectCollisions = rectCollisions.filter(
-    collision => stages.includes(collision.id as Stage)
+    collision => allStages.includes(collision.id as Stage)
   );
 
   return columnRectCollisions.length > 0 ? columnRectCollisions : rectCollisions;
@@ -64,6 +70,53 @@ export default function KanbanPage() {
   } = useApp();
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [collapsedColumns, setCollapsedColumns] = useState<Set<Stage> | null>(null);
+  const [hasInitializedCollapse, setHasInitializedCollapse] = useState(false);
+
+  // Get ideas for each stage - use filtered if search is active
+  const getColumnIdeas = useCallback(
+    (stage: Stage) => {
+      if (isSearchActive) {
+        return filteredIdeas.filter((idea) => idea.stage === stage);
+      }
+      return getIdeasByStage(stage);
+    },
+    [isSearchActive, filteredIdeas, getIdeasByStage]
+  );
+
+  // Compute which columns should be auto-collapsed
+  const autoCollapsedColumns = useMemo(() => {
+    const collapsed = new Set<Stage>();
+    // Always collapse Shipped
+    collapsed.add('shipped');
+    // Collapse empty simple columns (except spark - always show it)
+    for (const stage of simpleStages) {
+      if (stage !== 'spark' && getColumnIdeas(stage).length === 0) {
+        collapsed.add(stage);
+      }
+    }
+    return collapsed;
+  }, [getColumnIdeas]);
+
+  // Initialize collapsed state once data is loaded
+  useEffect(() => {
+    if (!isLoading && !hasInitializedCollapse) {
+      setCollapsedColumns(autoCollapsedColumns);
+      setHasInitializedCollapse(true);
+    }
+  }, [isLoading, hasInitializedCollapse, autoCollapsedColumns]);
+
+  const toggleColumn = useCallback((stage: Stage) => {
+    setCollapsedColumns(prev => {
+      const next = new Set(prev || []);
+      if (next.has(stage)) {
+        next.delete(stage);
+      } else {
+        next.add(stage);
+      }
+      return next;
+    });
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -88,7 +141,7 @@ export default function KanbanPage() {
       const newStage = over.id as Stage;
 
       // Check if dropped on a valid stage column
-      if (!stages.includes(newStage)) return;
+      if (!allStages.includes(newStage)) return;
 
       // Find the idea being dragged
       const idea = ideas.find((i) => i.id === ideaId);
@@ -102,16 +155,15 @@ export default function KanbanPage() {
 
   const activeIdea = activeId ? ideas.find((i) => i.id === activeId) : null;
 
-  // Get ideas for each stage - use filtered if search is active
-  const getColumnIdeas = useCallback(
-    (stage: Stage) => {
-      if (isSearchActive) {
-        return filteredIdeas.filter((idea) => idea.stage === stage);
-      }
-      return getIdeasByStage(stage);
-    },
-    [isSearchActive, filteredIdeas, getIdeasByStage]
-  );
+  // Get ideas for combined Active column (building + waiting + simmering)
+  const activeColumnIdeas = useMemo(() => ({
+    building: getColumnIdeas('building'),
+    waiting: getColumnIdeas('waiting'),
+    simmering: getColumnIdeas('simmering'),
+  }), [getColumnIdeas]);
+
+  // Use initialized collapsed state, or empty set while loading
+  const effectiveCollapsedColumns = collapsedColumns || new Set<Stage>();
 
   if (isLoading) {
     return (
@@ -158,15 +210,51 @@ export default function KanbanPage() {
         {/* Kanban Board */}
         <div className="flex-1 overflow-x-auto pb-4">
           <div className="flex gap-4 h-full min-w-max">
-            {stages.map((stage) => (
-              <DroppableColumn
-                key={stage}
-                stage={stage}
-                ideas={getColumnIdeas(stage)}
-                onOpenNewModal={openNewIdeaModal}
-                onEditIdea={openEditIdeaModal}
-              />
-            ))}
+            {/* Spark column */}
+            <DroppableColumn
+              stage="spark"
+              ideas={getColumnIdeas('spark')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('spark')}
+              onToggleCollapse={() => toggleColumn('spark')}
+            />
+
+            {/* Exploring column */}
+            <DroppableColumn
+              stage="exploring"
+              ideas={getColumnIdeas('exploring')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('exploring')}
+              onToggleCollapse={() => toggleColumn('exploring')}
+            />
+
+            {/* Combined Active column (Building/Waiting/Simmering) */}
+            <ActiveColumn
+              ideas={activeColumnIdeas}
+              onEditIdea={openEditIdeaModal}
+            />
+
+            {/* Shipped column */}
+            <DroppableColumn
+              stage="shipped"
+              ideas={getColumnIdeas('shipped')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('shipped')}
+              onToggleCollapse={() => toggleColumn('shipped')}
+            />
+
+            {/* Paused column */}
+            <DroppableColumn
+              stage="paused"
+              ideas={getColumnIdeas('paused')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('paused')}
+              onToggleCollapse={() => toggleColumn('paused')}
+            />
           </div>
         </div>
       </div>

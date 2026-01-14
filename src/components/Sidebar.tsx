@@ -7,9 +7,7 @@ import {
   Columns3,
   Clock,
   Sparkles,
-  Zap,
   Flame,
-  Lightbulb,
   Download,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
@@ -85,38 +83,6 @@ export function Sidebar({ stats, onExport }: SidebarProps) {
             );
           })}
         </nav>
-
-        {/* Quick Stats */}
-        {stats && (
-          <div className="p-4 border-t border-[var(--border)]">
-            <h3 className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider mb-3">
-              Quick Stats
-            </h3>
-            <div className="grid grid-cols-3 gap-2 text-center stagger-children">
-              <div className="p-2 bg-[var(--spark-bg)] rounded-xl group cursor-default">
-                <Zap className="w-4 h-4 mx-auto text-[var(--spark)] mb-1 group-hover:animate-spark-glow" />
-                <span className="block text-lg font-bold text-[var(--spark)]">
-                  {stats.byStage.spark}
-                </span>
-                <span className="text-[10px] text-[var(--muted-foreground)]">Ideas</span>
-              </div>
-              <div className="p-2 bg-[var(--building-bg)] rounded-xl group cursor-default">
-                <Flame className="w-4 h-4 mx-auto text-[var(--building)] mb-1" />
-                <span className="block text-lg font-bold text-[var(--building)]">
-                  {stats.byStage.building}
-                </span>
-                <span className="text-[10px] text-[var(--muted-foreground)]">Active</span>
-              </div>
-              <div className="p-2 bg-[var(--shipped-bg)] rounded-xl group cursor-default">
-                <Lightbulb className="w-4 h-4 mx-auto text-[var(--shipped)] mb-1 group-hover:animate-celebrate" />
-                <span className="block text-lg font-bold text-[var(--shipped)]">
-                  {stats.byStage.shipped}
-                </span>
-                <span className="text-[10px] text-[var(--muted-foreground)]">Shipped</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Theme Toggle */}
         <div className="p-4 border-t border-[var(--border)] flex justify-center">

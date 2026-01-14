@@ -6,6 +6,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-13-A] - Kanban Collapsible Columns & UI Simplification
+
+### Added
+
+**Collapsible Kanban Columns:**
+- Columns can now be collapsed/expanded by clicking the header
+- Collapsed columns show vertical text label, chevron icon, and card count
+- Auto-collapse behavior on initial load:
+  - Shipped column always starts collapsed
+  - Empty columns (except Spark) auto-collapse
+  - Spark column always stays expanded
+- Reduces horizontal scrolling and visual clutter
+
+**Combined "Active" Column:**
+- Building, Waiting, and Simmering stages merged into single "Active" column
+- Tabbed interface to switch between sub-stages
+- Drag-to-tab: Drop cards directly onto tabs to change their sub-stage
+- Each tab shows count badge (always visible, even when 0)
+- Total count shown in column header
+
+### Changed
+
+**Simplified IdeaCard Footer:**
+- Removed type labels (Campfire, Eternal Flame, etc.) from cards
+- Footer now shows only tags when present
+- Cards without tags have cleaner look (no empty footer)
+
+**Simplified IdeaModal:**
+- Removed Type selector entirely from edit modal
+- Type still exists in data model for AI auto-categorization
+- Reduces decision fatigue ("let's not label for label's sake")
+
+**Sidebar Cleanup:**
+- Removed Quick Stats widget (redundant with dashboard)
+
+### Files Created
+- `src/components/ActiveColumn.tsx` - Combined column with tabbed sub-stages
+
+### Files Modified
+- `src/app/kanban/page.tsx` - Collapsible state management, ActiveColumn integration
+- `src/components/DroppableColumn.tsx` - Collapse/expand UI and behavior
+- `src/components/IdeaCard.tsx` - Removed type display, simplified footer
+- `src/components/IdeaModal.tsx` - Removed Type selector section
+- `src/components/Sidebar.tsx` - Removed Quick Stats widget
+- `src/app/globals.css` - Added `.writing-vertical` utility class
+
+### Design Notes
+- Implements collapsible columns approach from 2026-01-12-A mockups
+- Combined Active column reduces 7 columns to 5 visual columns
+- Type removal follows "reduce unnecessary categorization" principle
+
+---
+
 ## [2026-01-12-B] - PAIA Integration Architecture Brainstorming
 
 ### Context
@@ -703,4 +756,4 @@ Surfaces at point of need on cards
 
 ---
 
-**Last Updated:** 2026-01-11L
+**Last Updated:** 2026-01-13A
