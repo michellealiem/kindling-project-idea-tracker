@@ -1,72 +1,169 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  pointerWithin,
+  rectIntersection,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  CollisionDetection,
+} from '@dnd-kit/core';
 import { useApp } from '@/components/AppProvider';
-import { StatsCard } from '@/components/StatsCard';
+import { DroppableColumn } from '@/components/DroppableColumn';
+import { ActiveColumn } from '@/components/ActiveColumn';
 import { IdeaCard } from '@/components/IdeaCard';
 import { SearchBar } from '@/components/SearchBar';
-import {
-  Zap,
-  Flame,
-  Lightbulb,
-  Crown,
-  Plus,
-  Search,
-  Clock,
-  Sparkles,
-} from 'lucide-react';
+import { Stage } from '@/lib/types';
+import { Flame } from 'lucide-react';
 
-export default function DashboardPage() {
+// Simple columns (not combined)
+const simpleStages: Stage[] = ['spark', 'exploring', 'shipped', 'paused'];
+// Combined "Active" stages shown with tabs
+const activeStages: Stage[] = ['building', 'waiting', 'simmering'];
+// All stages for collision detection
+const allStages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
+
+// Custom collision detection that prioritizes column drops
+// Uses pointerWithin first (more forgiving), falls back to rectIntersection
+const customCollisionDetection: CollisionDetection = (args) => {
+  // First try pointerWithin (checks if pointer is within droppable)
+  const pointerCollisions = pointerWithin(args);
+
+  // Filter to only include stage columns (not cards)
+  const columnCollisions = pointerCollisions.filter(
+    collision => allStages.includes(collision.id as Stage)
+  );
+
+  if (columnCollisions.length > 0) {
+    return columnCollisions;
+  }
+
+  // Fall back to rect intersection with all droppables
+  const rectCollisions = rectIntersection(args);
+  const columnRectCollisions = rectCollisions.filter(
+    collision => allStages.includes(collision.id as Stage)
+  );
+
+  return columnRectCollisions.length > 0 ? columnRectCollisions : rectCollisions;
+};
+
+export default function KanbanPage() {
   const {
-    stats,
     isLoading,
     ideas,
-    themes,
     getIdeasByStage,
-    getRecentIdeas,
+    updateIdea,
     openNewIdeaModal,
     openEditIdeaModal,
+    filteredIdeas,
+    isSearchActive,
     searchQuery,
     setSearchQuery,
     searchFilters,
     setSearchFilters,
     allTags,
-    filteredIdeas,
-    isSearchActive,
   } = useApp();
 
-  // Dashboard insights state
-  const [insightsLoading, setInsightsLoading] = useState(false);
-  const [insights, setInsights] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [collapsedColumns, setCollapsedColumns] = useState<Set<Stage> | null>(null);
+  const [hasInitializedCollapse, setHasInitializedCollapse] = useState(false);
 
-  const handleGetInsights = async () => {
-    setInsightsLoading(true);
-    setInsights(null);
+  // Get ideas for each stage - use filtered if search is active
+  const getColumnIdeas = useCallback(
+    (stage: Stage) => {
+      if (isSearchActive) {
+        return filteredIdeas.filter((idea) => idea.stage === stage);
+      }
+      return getIdeasByStage(stage);
+    },
+    [isSearchActive, filteredIdeas, getIdeasByStage]
+  );
 
-    try {
-      const { buildDashboardInsightsPrompt } = await import('@/lib/ollama');
-      const prompt = buildDashboardInsightsPrompt(
-        ideas.map((i) => ({ title: i.title, type: i.type, stage: i.stage, tags: i.tags })),
-        themes.map((t) => ({ title: t.title, description: t.description }))
-      );
-
-      const response = await fetch('/api/suggest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, type: 'dashboard-insights' }),
-      });
-
-      if (!response.ok) throw new Error('Failed to get insights');
-
-      const data = await response.json();
-      setInsights(data.suggestion);
-    } catch (error) {
-      console.error('Dashboard insights error:', error);
-      setInsights('Unable to generate insights. Make sure Ollama is running.');
-    } finally {
-      setInsightsLoading(false);
+  // Compute which columns should be auto-collapsed
+  const autoCollapsedColumns = useMemo(() => {
+    const collapsed = new Set<Stage>();
+    // Always collapse Shipped
+    collapsed.add('shipped');
+    // Collapse empty simple columns (except spark - always show it)
+    for (const stage of simpleStages) {
+      if (stage !== 'spark' && getColumnIdeas(stage).length === 0) {
+        collapsed.add(stage);
+      }
     }
-  };
+    return collapsed;
+  }, [getColumnIdeas]);
+
+  // Initialize collapsed state once data is loaded
+  useEffect(() => {
+    if (!isLoading && !hasInitializedCollapse) {
+      setCollapsedColumns(autoCollapsedColumns);
+      setHasInitializedCollapse(true);
+    }
+  }, [isLoading, hasInitializedCollapse, autoCollapsedColumns]);
+
+  const toggleColumn = useCallback((stage: Stage) => {
+    setCollapsedColumns(prev => {
+      const next = new Set(prev || []);
+      if (next.has(stage)) {
+        next.delete(stage);
+      } else {
+        next.add(stage);
+      }
+      return next;
+    });
+  }, []);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Prevent accidental drags
+      },
+    })
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveId(null);
+
+      if (!over) return;
+
+      const ideaId = active.id as string;
+      const newStage = over.id as Stage;
+
+      // Check if dropped on a valid stage column
+      if (!allStages.includes(newStage)) return;
+
+      // Find the idea being dragged
+      const idea = ideas.find((i) => i.id === ideaId);
+      if (!idea || idea.stage === newStage) return;
+
+      // Update the stage
+      updateIdea(ideaId, { stage: newStage });
+    },
+    [ideas, updateIdea]
+  );
+
+  const activeIdea = activeId ? ideas.find((i) => i.id === activeId) : null;
+
+  // Get ideas for combined Active column (building + waiting + simmering)
+  const activeColumnIdeas = useMemo(() => ({
+    building: getColumnIdeas('building'),
+    waiting: getColumnIdeas('waiting'),
+    simmering: getColumnIdeas('simmering'),
+  }), [getColumnIdeas]);
+
+  // Use initialized collapsed state, or empty set while loading
+  const effectiveCollapsedColumns = collapsedColumns || new Set<Stage>();
 
   if (isLoading) {
     return (
@@ -79,28 +176,27 @@ export default function DashboardPage() {
     );
   }
 
-  const activeIdeas = getIdeasByStage('building');
-  const waitingIdeas = getIdeasByStage('waiting');
-  const simmeringIdeas = getIdeasByStage('simmering');
-  const recentSparks = getIdeasByStage('spark').slice(0, 5);
-  const recentShipped = getIdeasByStage('shipped').slice(0, 5);
-
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto animate-fade-up">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
-            Dashboard
-          </h1>
-          <p className="text-[var(--muted-foreground)]">
-            {isSearchActive
-              ? `${filteredIdeas.length} ${filteredIdeas.length === 1 ? 'result' : 'results'}`
-              : 'Overview of all your ideas and projects'}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex-1 sm:w-64 lg:w-80">
+    <DndContext
+      sensors={sensors}
+      collisionDetection={customCollisionDetection}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="p-6 lg:p-8 pb-24 lg:pb-8 min-h-screen flex flex-col animate-fade-up">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 flex-shrink-0">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)]">
+              Kindling
+            </h1>
+            <p className="text-[var(--muted-foreground)]">
+              {isSearchActive
+                ? `Showing ${filteredIdeas.length} filtered ideas`
+                : 'Drag cards to move between stages'}
+            </p>
+          </div>
+          <div className="sm:w-64 lg:w-80">
             <SearchBar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -109,330 +205,68 @@ export default function DashboardPage() {
               allTags={allTags}
             />
           </div>
-          <button
-            onClick={openNewIdeaModal}
-            className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[var(--primary)]/20"
-          >
-            <Plus className="w-5 h-5" />
-            New Idea
-          </button>
         </div>
-      </div>
 
-      {/* Stats Row - Primary stages */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
-        <StatsCard
-          label="Ideas"
-          value={stats?.byStage.spark ?? 0}
-          icon={<Zap className="w-6 h-6" />}
-          stage="spark"
-        />
-        <StatsCard
-          label="Exploring"
-          value={stats?.byStage.exploring ?? 0}
-          icon={<Search className="w-6 h-6" />}
-          stage="exploring"
-        />
-        {/* Active card with Waiting/Simmering badges */}
-        <div className="card-base p-4 relative">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[var(--muted-foreground)] mb-1">Active</p>
-              <p className="text-3xl font-bold text-[var(--building)]">
-                {stats?.byStage.building ?? 0}
-              </p>
-            </div>
-            <div className="p-2 rounded-xl bg-[var(--building-bg)]">
-              <Flame className="w-6 h-6 text-[var(--building)]" />
-            </div>
-          </div>
-          {/* Sub-badges for Waiting & Simmering */}
-          <div className="flex gap-2 mt-3 pt-3 border-t border-[var(--border)]">
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--waiting-bg)] text-xs">
-              <Clock className="w-3 h-3 text-[var(--waiting)]" />
-              <span className="font-medium text-[var(--waiting)]">{stats?.byStage.waiting ?? 0}</span>
-              <span className="text-[var(--muted-foreground)]">waiting</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--simmering-bg)] text-xs">
-              <Flame className="w-3 h-3 text-[var(--simmering)] opacity-60" />
-              <span className="font-medium text-[var(--simmering)]">{stats?.byStage.simmering ?? 0}</span>
-              <span className="text-[var(--muted-foreground)]">simmering</span>
-            </div>
-          </div>
-        </div>
-        <StatsCard
-          label="Shipped"
-          value={stats?.byStage.shipped ?? 0}
-          icon={<Lightbulb className="w-6 h-6" />}
-          stage="shipped"
-        />
-      </div>
+        {/* Kanban Board */}
+        <div className="flex-1 overflow-x-auto pb-4">
+          <div className="flex gap-4 items-start min-w-max">
+            {/* Spark column */}
+            <DroppableColumn
+              stage="spark"
+              ideas={getColumnIdeas('spark')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('spark')}
+              onToggleCollapse={() => toggleColumn('spark')}
+            />
 
-      {/* Secondary row - Paused & Eternal Flames */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="card-base p-4 opacity-70">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[var(--muted-foreground)] mb-1">Paused</p>
-              <p className="text-2xl font-bold text-[var(--muted)]">
-                {stats?.byStage.paused ?? 0}
-              </p>
-            </div>
-            <div className="p-2 rounded-xl bg-[var(--secondary)]">
-              <Clock className="w-5 h-5 text-[var(--muted)]" />
-            </div>
-          </div>
-        </div>
-        <div className="card-base p-4 bg-gradient-to-br from-[var(--card)] to-amber-50/30 dark:to-amber-900/10">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[var(--muted-foreground)] mb-1">Eternal Flames</p>
-              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                {stats?.permasolutions ?? 0}
-              </p>
-            </div>
-            <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/30">
-              <Crown className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            </div>
+            {/* Exploring column */}
+            <DroppableColumn
+              stage="exploring"
+              ideas={getColumnIdeas('exploring')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('exploring')}
+              onToggleCollapse={() => toggleColumn('exploring')}
+            />
+
+            {/* Combined Active column (Building/Waiting/Simmering) */}
+            <ActiveColumn
+              ideas={activeColumnIdeas}
+              onEditIdea={openEditIdeaModal}
+            />
+
+            {/* Shipped column */}
+            <DroppableColumn
+              stage="shipped"
+              ideas={getColumnIdeas('shipped')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('shipped')}
+              onToggleCollapse={() => toggleColumn('shipped')}
+            />
+
+            {/* Paused column */}
+            <DroppableColumn
+              stage="paused"
+              ideas={getColumnIdeas('paused')}
+              onOpenNewModal={openNewIdeaModal}
+              onEditIdea={openEditIdeaModal}
+              isCollapsed={effectiveCollapsedColumns.has('paused')}
+              onToggleCollapse={() => toggleColumn('paused')}
+            />
           </div>
         </div>
       </div>
 
-      {/* AI Insights Section */}
-      {ideas.length > 0 && (
-        <div className="mb-8 card-base p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-gradient-to-r from-[var(--spark-bg)] to-[var(--primary)]/10">
-                <Sparkles className="w-5 h-5 text-[var(--spark)]" />
-              </div>
-              <h2 className="text-lg font-semibold text-[var(--foreground)]">
-                AI Insights
-              </h2>
-            </div>
-            <button
-              onClick={handleGetInsights}
-              disabled={insightsLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[var(--spark)] to-[var(--primary)] text-white rounded-xl text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {insightsLoading ? (
-                <>
-                  <Flame className="w-4 h-4 animate-pulse" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  Analyze Portfolio
-                </>
-              )}
-            </button>
+      {/* Drag overlay for visual feedback */}
+      <DragOverlay>
+        {activeIdea ? (
+          <div className="rotate-2 scale-105 opacity-90">
+            <IdeaCard idea={activeIdea} onClick={() => {}} />
           </div>
-
-          {insights ? (
-            <div className="prose prose-sm max-w-none text-[var(--muted-foreground)] whitespace-pre-wrap leading-relaxed">
-              {insights}
-            </div>
-          ) : (
-            <p className="text-[var(--muted-foreground)] text-sm">
-              Click &quot;Analyze Portfolio&quot; to get AI-powered insights about your ideas and projects.
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Main Grid */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Currently Active - Takes 2 columns */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Active Projects */}
-          <div className="card-base p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 rounded-lg bg-[var(--building-bg)]">
-                <Flame className="w-5 h-5 text-[var(--building)]" />
-              </div>
-              <h2 className="text-lg font-semibold text-[var(--foreground)]">
-                Currently Active
-              </h2>
-              {activeIdeas.length > 3 && (
-                <span className="text-xs text-[var(--spark)] bg-[var(--spark-bg)] px-2 py-0.5 rounded-full">
-                  {activeIdeas.length} active - consider focusing!
-                </span>
-              )}
-            </div>
-
-            {activeIdeas.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--building-bg)] flex items-center justify-center">
-                  <Flame className="w-8 h-8 text-[var(--building)] opacity-50" />
-                </div>
-                <p className="text-[var(--muted-foreground)] mb-4">
-                  No active projects yet
-                </p>
-                <button
-                  onClick={openNewIdeaModal}
-                  className="text-[var(--primary)] font-medium hover:underline underline-offset-4 transition-all"
-                >
-                  Start building something
-                </button>
-              </div>
-            ) : (
-              <div className="grid gap-4 stagger-children">
-                {activeIdeas.map((idea) => (
-                  <IdeaCard
-                    key={idea.id}
-                    idea={idea}
-                    onClick={openEditIdeaModal}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Waiting & Simmering row */}
-          {(waitingIdeas.length > 0 || simmeringIdeas.length > 0) && (
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Waiting */}
-              {waitingIdeas.length > 0 && (
-                <div className="card-base p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="p-1 rounded-lg bg-[var(--waiting-bg)]">
-                      <Clock className="w-4 h-4 text-[var(--waiting)]" />
-                    </div>
-                    <h3 className="font-medium text-[var(--foreground)]">Waiting</h3>
-                    <span className="text-xs text-[var(--muted-foreground)]">({waitingIdeas.length})</span>
-                  </div>
-                  <div className="space-y-2">
-                    {waitingIdeas.slice(0, 3).map((idea) => (
-                      <IdeaCard
-                        key={idea.id}
-                        idea={idea}
-                        onClick={openEditIdeaModal}
-                        compact
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Simmering */}
-              {simmeringIdeas.length > 0 && (
-                <div className="card-base p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="p-1 rounded-lg bg-[var(--simmering-bg)]">
-                      <Flame className="w-4 h-4 text-[var(--simmering)] opacity-60" />
-                    </div>
-                    <h3 className="font-medium text-[var(--foreground)]">Simmering</h3>
-                    <span className="text-xs text-[var(--muted-foreground)]">({simmeringIdeas.length})</span>
-                  </div>
-                  <div className="space-y-2">
-                    {simmeringIdeas.slice(0, 3).map((idea) => (
-                      <IdeaCard
-                        key={idea.id}
-                        idea={idea}
-                        onClick={openEditIdeaModal}
-                        compact
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Recent Ideas */}
-        <div className="space-y-8">
-          <div className="card-base p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 rounded-lg bg-[var(--spark-bg)]">
-                <Zap className="w-5 h-5 text-[var(--spark)]" />
-              </div>
-              <h2 className="text-lg font-semibold text-[var(--foreground)]">
-                Recent Ideas
-              </h2>
-            </div>
-
-            {recentSparks.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[var(--spark-bg)] flex items-center justify-center">
-                  <Zap className="w-7 h-7 text-[var(--spark)] opacity-50" />
-                </div>
-                <p className="text-sm text-[var(--muted-foreground)]">
-                  No ideas yet. Capture your first!
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3 stagger-children">
-                {recentSparks.map((idea) => (
-                  <IdeaCard
-                    key={idea.id}
-                    idea={idea}
-                    onClick={openEditIdeaModal}
-                    compact
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Recently Shipped */}
-          <div className="card-base p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 rounded-lg bg-[var(--shipped-bg)]">
-                <Lightbulb className="w-5 h-5 text-[var(--shipped)]" />
-              </div>
-              <h2 className="text-lg font-semibold text-[var(--foreground)]">
-                Recently Shipped
-              </h2>
-            </div>
-
-            {recentShipped.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[var(--shipped-bg)] flex items-center justify-center">
-                  <Lightbulb className="w-7 h-7 text-[var(--shipped)] opacity-50" />
-                </div>
-                <p className="text-sm text-[var(--muted-foreground)]">
-                  Ship your first project!
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3 stagger-children">
-                {recentShipped.map((idea) => (
-                  <IdeaCard
-                    key={idea.id}
-                    idea={idea}
-                    onClick={openEditIdeaModal}
-                    compact
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Empty State */}
-      {stats?.total === 0 && (
-        <div className="mt-12 text-center py-16 bg-gradient-to-br from-[var(--spark-bg)] via-[var(--card)] to-[var(--primary)]/5 rounded-3xl border border-[var(--border)] animate-scale-in">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[var(--spark)] to-[var(--primary)] flex items-center justify-center animate-spark-glow">
-            <Flame className="w-10 h-10 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">
-            Welcome to Kindling
-          </h2>
-          <p className="text-[var(--muted-foreground)] mb-6 max-w-md mx-auto">
-            Where ideas catch fire. Nurture sparks into blazing beacons.
-          </p>
-          <button
-            onClick={openNewIdeaModal}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[var(--primary)]/20"
-          >
-            <Plus className="w-5 h-5" />
-            Strike Your First Spark
-          </button>
-        </div>
-      )}
-    </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

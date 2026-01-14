@@ -2,11 +2,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getIdea, updateIdea as updateIdeaInSheet, deleteIdea as deleteIdeaFromSheet, isGoogleSheetsConfigured } from '@/lib/google-sheets';
+import { checkAuth, unauthorizedResponse } from '@/lib/api-auth';
 
 // Zod schema for update validation (all fields optional)
 const StageSchema = z.enum(['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused']);
 const IdeaTypeSchema = z.enum(['permasolution', 'project', 'experiment', 'learning']);
 const EffortSchema = z.enum(['trivial', 'small', 'medium', 'large', 'epic']);
+
+// Link schemas for PAIA integration
+const MemoryLinkSchema = z.object({
+  id: z.string(),
+  date: z.string(),
+  excerpt: z.string().max(500),
+  sourceFile: z.string().optional(),
+});
+
+const ResourceLinkSchema = z.object({
+  id: z.string(),
+  type: z.enum(['video', 'podcast', 'article', 'paper']),
+  title: z.string().max(200),
+  url: z.string().url().optional(),
+  note: z.string().max(500).optional(),
+});
+
+const PersonLinkSchema = z.object({
+  id: z.string(),
+  name: z.string().max(100),
+  role: z.string().max(100).optional(),
+  isBlocking: z.boolean().optional(),
+});
 
 const UpdateIdeaSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -17,17 +41,26 @@ const UpdateIdeaSchema = z.object({
   effort: EffortSchema.optional(),
   notes: z.string().max(10000).optional(),
   startedAt: z.string().optional(),
+  statusNote: z.string().max(500).optional(),
   stageHistory: z.array(z.object({
     stage: StageSchema,
     date: z.string(),
   })).optional(),
-}).strict();
+  memoryLinks: z.array(MemoryLinkSchema).optional(),
+  resourceLinks: z.array(ResourceLinkSchema).optional(),
+  personLinks: z.array(PersonLinkSchema).optional(),
+});
 
 // GET /api/ideas/[id] - Get a single idea
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = checkAuth(request);
+  if (!auth.authenticated) {
+    return unauthorizedResponse(auth.error);
+  }
+
   if (!isGoogleSheetsConfigured()) {
     return NextResponse.json(
       { error: 'Google Sheets not configured' },
@@ -61,6 +94,11 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = checkAuth(request);
+  if (!auth.authenticated) {
+    return unauthorizedResponse(auth.error);
+  }
+
   if (!isGoogleSheetsConfigured()) {
     return NextResponse.json(
       { error: 'Google Sheets not configured' },
@@ -107,6 +145,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = checkAuth(request);
+  if (!auth.authenticated) {
+    return unauthorizedResponse(auth.error);
+  }
+
   if (!isGoogleSheetsConfigured()) {
     return NextResponse.json(
       { error: 'Google Sheets not configured' },

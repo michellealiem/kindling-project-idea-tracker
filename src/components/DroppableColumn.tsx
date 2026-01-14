@@ -89,7 +89,7 @@ export function DroppableColumn({
       {/* Cards Container - only show when expanded */}
       {!isCollapsed && (
         <SortableContext items={ideas.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-          <div className="flex-1 overflow-y-auto space-y-3 min-h-[100px]">
+          <div className="space-y-3 min-h-[100px]">
             {ideas.length === 0 ? (
               <div
                 className={`text-center py-8 border-2 border-dashed rounded-xl transition-colors ${

@@ -109,7 +109,7 @@ export function ActiveColumn({ ideas, onEditIdea }: ActiveColumnProps) {
 
       {/* Cards Container */}
       <SortableContext items={currentIdeas.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-        <div className="flex-1 overflow-y-auto space-y-3 min-h-[100px]">
+        <div className="space-y-3 min-h-[100px]">
           {currentIdeas.length === 0 ? (
             <div className="text-center py-8 border-2 border-dashed border-transparent rounded-xl">
               <div

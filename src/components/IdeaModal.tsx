@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Trash2, Sparkles, Zap, Flame, Lightbulb, CircleDot, Calendar, Search, Clock } from 'lucide-react';
+import { X, Trash2, Sparkles, Zap, Flame, Lightbulb, CircleDot, Calendar, Search, Clock, Target, AlertCircle, Timer } from 'lucide-react';
 import { Idea, Stage, IdeaType, Effort, STAGE_CONFIG, EFFORT_CONFIG } from '@/lib/types';
 
 interface IdeaModalProps {
@@ -59,8 +59,18 @@ export function IdeaModal({
   const [effort, setEffort] = useState<Effort>('medium');
   const [notes, setNotes] = useState('');
   const [startedAt, setStartedAt] = useState('');
+  const [statusNote, setStatusNote] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [categorizationLoading, setCategorizationLoading] = useState(false);
+
+  // Config for status note field based on stage
+  const statusNoteConfig: Record<string, { icon: typeof Target; label: string; placeholder: string }> = {
+    building: { icon: Target, label: 'Current Focus', placeholder: 'What feature are you building right now?' },
+    waiting: { icon: AlertCircle, label: 'Blocker', placeholder: 'What exactly is blocking progress?' },
+    simmering: { icon: Timer, label: 'Simmer Reason', placeholder: 'Why is this simmering? What needs to happen?' },
+  };
+
+  const isActiveStage = ['building', 'waiting', 'simmering'].includes(stage);
 
   // Auto-categorize using AI
   const handleAutoCategorize = async () => {
@@ -124,6 +134,7 @@ export function IdeaModal({
       setTags(idea.tags.join(', '));
       setEffort(idea.effort);
       setNotes(idea.notes);
+      setStatusNote(idea.statusNote || '');
       // Convert ISO string to date input format (YYYY-MM-DD)
       setStartedAt(idea.startedAt ? idea.startedAt.split('T')[0] : '');
     } else {
@@ -134,6 +145,7 @@ export function IdeaModal({
       setTags('');
       setEffort('medium');
       setNotes('');
+      setStatusNote('');
       // Auto-populate with today's date in PST
       setStartedAt(getTodayPST());
     }
@@ -155,6 +167,7 @@ export function IdeaModal({
         .filter(Boolean),
       effort,
       notes: notes.trim(),
+      statusNote: statusNote.trim(),
       ...(startedAt && { startedAt: new Date(startedAt).toISOString() }),
     };
 
@@ -288,6 +301,37 @@ export function IdeaModal({
               })}
             </div>
           </div>
+
+          {/* Status Note - only for active stages */}
+          {isActiveStage && (
+            <div
+              className="p-4 rounded-xl border-l-4 transition-colors"
+              style={{
+                backgroundColor: `var(--${stage}-bg)`,
+                borderLeftColor: `var(--${stage}-border)`,
+              }}
+            >
+              {(() => {
+                const config = statusNoteConfig[stage];
+                const StatusIcon = config.icon;
+                return (
+                  <>
+                    <label className="flex items-center gap-2 text-sm font-medium mb-2" style={{ color: `var(--${stage})` }}>
+                      <StatusIcon className="w-4 h-4" />
+                      {config.label}
+                    </label>
+                    <input
+                      type="text"
+                      value={statusNote}
+                      onChange={(e) => setStatusNote(e.target.value)}
+                      placeholder={config.placeholder}
+                      className="w-full px-3 py-2 bg-[var(--card)] border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all text-sm placeholder:text-[var(--muted)]"
+                    />
+                  </>
+                );
+              })()}
+            </div>
+          )}
 
           {/* Tags */}
           <div>

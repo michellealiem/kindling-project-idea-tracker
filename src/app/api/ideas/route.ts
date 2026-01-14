@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAllIdeas, createIdea as createIdeaInSheet, isGoogleSheetsConfigured } from '@/lib/google-sheets';
+import { checkAuth, unauthorizedResponse } from '@/lib/api-auth';
 import { Idea } from '@/lib/types';
 
 // Zod schemas for input validation
@@ -18,10 +19,17 @@ const CreateIdeaSchema = z.object({
   effort: EffortSchema.optional().default('medium'),
   notes: z.string().max(10000, 'Notes too long').optional().default(''),
   startedAt: z.string().optional(),
+  statusNote: z.string().max(500, 'Status note too long').optional(),
 });
 
 // GET /api/ideas - Get all ideas
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check auth
+  const auth = checkAuth(request);
+  if (!auth.authenticated) {
+    return unauthorizedResponse(auth.error);
+  }
+
   if (!isGoogleSheetsConfigured()) {
     return NextResponse.json(
       { error: 'Google Sheets not configured' },
@@ -43,6 +51,12 @@ export async function GET() {
 
 // POST /api/ideas - Create a new idea
 export async function POST(request: NextRequest) {
+  // Check auth
+  const auth = checkAuth(request);
+  if (!auth.authenticated) {
+    return unauthorizedResponse(auth.error);
+  }
+
   if (!isGoogleSheetsConfigured()) {
     return NextResponse.json(
       { error: 'Google Sheets not configured' },
@@ -77,6 +91,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
       startedAt: validated.startedAt,
       stageHistory: [{ stage: validated.stage, date: now }],
+      statusNote: validated.statusNote,
     };
 
     const created = await createIdeaInSheet(newIdea);

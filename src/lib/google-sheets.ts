@@ -67,6 +67,16 @@ async function getSpreadsheet() {
   return doc;
 }
 
+// Safely parse JSON, returning undefined on failure
+function safeJsonParse<T>(str: string | undefined): T | undefined {
+  if (!str) return undefined;
+  try {
+    return JSON.parse(str);
+  } catch {
+    return undefined;
+  }
+}
+
 // Convert row to Idea
 function rowToIdea(row: GoogleSpreadsheetRow<Record<string, string>>): Idea {
   const tagsStr = row.get('tags') || '';
@@ -92,8 +102,13 @@ function rowToIdea(row: GoogleSpreadsheetRow<Record<string, string>>): Idea {
     notes: row.get('notes') || '',
     createdAt: row.get('createdAt'),
     updatedAt: row.get('updatedAt'),
+    startedAt: row.get('startedAt') || undefined,
     stageHistory,
     aiSuggestions: aiSuggestionsStr ? aiSuggestionsStr.split('|||').filter(Boolean) : undefined,
+    statusNote: row.get('statusNote') || undefined,
+    memoryLinks: safeJsonParse(row.get('memoryLinks')),
+    resourceLinks: safeJsonParse(row.get('resourceLinks')),
+    personLinks: safeJsonParse(row.get('personLinks')),
   };
 }
 
@@ -115,8 +130,13 @@ function ideaToRow(idea: Idea): Record<string, string> {
     notes: idea.notes || '',
     createdAt: idea.createdAt,
     updatedAt: idea.updatedAt,
+    startedAt: idea.startedAt || '',
     stageHistory: stageHistoryStr,
     aiSuggestions: idea.aiSuggestions ? idea.aiSuggestions.join('|||') : '',
+    statusNote: idea.statusNote || '',
+    memoryLinks: idea.memoryLinks ? JSON.stringify(idea.memoryLinks) : '',
+    resourceLinks: idea.resourceLinks ? JSON.stringify(idea.resourceLinks) : '',
+    personLinks: idea.personLinks ? JSON.stringify(idea.personLinks) : '',
   };
 }
 
@@ -353,7 +373,7 @@ export async function bulkSyncIdeas(ideas: Idea[]): Promise<{ created: number; s
 export async function initializeSheets(): Promise<void> {
   const doc = await getSpreadsheet();
 
-  const ideasHeaders = ['id', 'title', 'description', 'stage', 'type', 'tags', 'effort', 'notes', 'createdAt', 'updatedAt', 'stageHistory', 'aiSuggestions'];
+  const ideasHeaders = ['id', 'title', 'description', 'stage', 'type', 'tags', 'effort', 'notes', 'createdAt', 'updatedAt', 'startedAt', 'stageHistory', 'aiSuggestions', 'statusNote', 'memoryLinks', 'resourceLinks', 'personLinks'];
   const themesHeaders = ['id', 'title', 'description', 'occurrences', 'keyMoments', 'linkedIdeas', 'source'];
   const learningsHeaders = ['id', 'date', 'title', 'context', 'discovery', 'actionable', 'linkedIdeas', 'source'];
 

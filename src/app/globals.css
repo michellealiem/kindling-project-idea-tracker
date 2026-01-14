@@ -661,6 +661,21 @@ body {
   padding-top: env(safe-area-inset-top, 0);
 }
 
+.safe-area-pl {
+  padding-left: env(safe-area-inset-left, 0);
+}
+
+.safe-area-pr {
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
 /* Mobile FAB (Floating Action Button) */
 .fab {
   position: fixed;

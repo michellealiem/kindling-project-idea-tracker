@@ -6,6 +6,80 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-14-A] - Design Refinements & PAIA API Integration
+
+### Added
+
+**PAIA API Integration:**
+- New `/api/ideas/[id]/links` endpoint for managing idea links (memories, resources, people)
+- API key authentication (`KINDLING_API_KEY` env var) for external access from PAIA
+- Dual auth support: cookie auth (browser) + API key auth (PAIA via Telegram)
+- Timing-safe comparison for API key validation (prevents timing attacks)
+- New link types in data model:
+  - `MemoryLink` - Links to PAIA journal memories (date, excerpt, sourceFile)
+  - `ResourceLink` - Links to videos, podcasts, articles, papers
+  - `PersonLink` - CRM-style people links with blocking status
+
+**Status Note Field:**
+- New `statusNote` field for active stages (building/waiting/simmering)
+- Color-coded input in IdeaModal based on stage
+- Status bar displayed on IdeaCard for active items
+- Labels: "Focus" (building), "Blocked" (waiting), "Reason" (simmering)
+
+**Mobile Improvements:**
+- Safe area inset CSS for iPhone notch/dynamic island support
+- Bottom nav bar no longer cut off on iPhone 17 Pro
+
+### Changed
+
+**Views Simplified:**
+- Removed Dashboard view - root page now shows Kanban directly
+- Removed Timeline view entirely (deleted `/app/timeline/`)
+- Sidebar nav simplified to just Kanban and Insights
+
+**Card Display:**
+- Removed all "Eternal Flame" / crown / permasolution badges from cards
+- Columns now show all cards (removed fixed height, uses page scroll)
+- PAIA link indicators shown on cards (brain, book, users icons)
+
+### Removed
+- Dashboard page (redundant with Kanban)
+- Timeline page (not practical for workflow)
+- Crown/Eternal Flame type badges (unnecessary categorization)
+
+### Files Created
+- `src/lib/api-auth.ts` - API authentication helper
+- `src/app/api/ideas/[id]/links/route.ts` - Links CRUD endpoint
+
+### Files Modified
+- `src/app/api/ideas/route.ts` - Added auth checks, statusNote field
+- `src/app/api/ideas/[id]/route.ts` - Added auth checks, link schemas
+- `src/lib/google-sheets.ts` - Added link columns, safeJsonParse helper
+- `src/lib/types.ts` - Added link types, statusNote field
+- `src/components/IdeaCard.tsx` - Status bar, PAIA indicators, removed crown
+- `src/components/IdeaModal.tsx` - Status note input for active stages
+- `src/components/Sidebar.tsx` - Removed Dashboard/Timeline nav, safe area padding
+- `src/components/DroppableColumn.tsx` - Full height columns
+- `src/components/ActiveColumn.tsx` - Full height columns
+- `src/app/page.tsx` - Now renders Kanban board directly
+- `src/app/globals.css` - Safe area inset utilities
+
+### Files Deleted
+- `src/app/kanban/page.tsx` - Merged into root page
+- `src/app/timeline/page.tsx` - Removed entirely
+
+### Security Notes
+- API key authentication uses timing-safe comparison
+- Input validation with Zod on all endpoints
+- Error details only shown in development mode
+
+### TODO (Future Security Enhancements)
+- Add rate limiting for API endpoints
+- Consider read-only vs read-write API key scopes
+- Replace static cookie value with signed session tokens
+
+---
+
 ## [2026-01-13-A] - Kanban Collapsible Columns & UI Simplification
 
 ### Added
@@ -756,4 +830,4 @@ Surfaces at point of need on cards
 
 ---
 
-**Last Updated:** 2026-01-13A
+**Last Updated:** 2026-01-14A

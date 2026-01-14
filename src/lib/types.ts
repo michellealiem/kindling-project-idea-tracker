@@ -9,6 +9,29 @@ export interface StageHistoryEntry {
   date: string;
 }
 
+// Future PAIA integration types
+export interface MemoryLink {
+  id: string;
+  date: string;
+  excerpt: string;       // Brief excerpt from the memory
+  sourceFile?: string;   // Path to PAIA memory file
+}
+
+export interface ResourceLink {
+  id: string;
+  type: 'video' | 'podcast' | 'article' | 'paper';
+  title: string;
+  url?: string;
+  note?: string;         // Your note about why this is relevant
+}
+
+export interface PersonLink {
+  id: string;
+  name: string;
+  role?: string;         // Their role on this project (reviewer, approver, collaborator)
+  isBlocking?: boolean;  // Are they a blocking dependency?
+}
+
 export interface Idea {
   id: string;
   title: string;
@@ -23,6 +46,13 @@ export interface Idea {
   startedAt?: string; // Optional: when work actually began (for backdating old projects)
   stageHistory: StageHistoryEntry[];
   aiSuggestions?: string[];
+  // Status note for active stages - what you're working on / what's blocking / why simmering
+  statusNote?: string;
+  // Future PAIA integration fields
+  memoryLinks?: MemoryLink[];     // Linked memories/journal entries
+  resourceLinks?: ResourceLink[]; // Linked videos/podcasts/articles
+  personLinks?: PersonLink[];     // Linked people (CRM integration)
+  visibility?: 'private' | 'team' | 'public'; // For future sharing features
 }
 
 export interface Theme {
@@ -139,7 +169,7 @@ export const TYPE_CONFIG: Record<IdeaType, { label: string; color: string; descr
     longDescription: 'A project requiring ongoing attention, updates, or maintenance to keep running.'
   },
   permasolution: {
-    label: 'Eternal Flame',
+    label: 'Permasolution',
     color: 'text-[var(--permasolution)]',
     description: 'Build once, burns forever',
     longDescription: 'A solution built once that runs indefinitely without ongoing maintenance. Set it up and forget it.'

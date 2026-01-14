@@ -3,9 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
   Columns3,
-  Clock,
   Sparkles,
   Flame,
   Download,
@@ -30,9 +28,7 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/kanban', label: 'Kanban', icon: Columns3 },
-  { href: '/timeline', label: 'Timeline', icon: Clock },
+  { href: '/', label: 'Kanban', icon: Columns3 },
   { href: '/insights', label: 'Insights', icon: Sparkles },
 ];
 
@@ -102,7 +98,7 @@ export function Sidebar({ stats, onExport }: SidebarProps) {
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--card)]/95 backdrop-blur-lg border-t border-[var(--border)] z-50 safe-area-pb">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--card)]/95 backdrop-blur-lg border-t border-[var(--border)] z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)', paddingLeft: 'env(safe-area-inset-left, 0)', paddingRight: 'env(safe-area-inset-right, 0)' }}>
         <div className="flex justify-around items-center h-16">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
