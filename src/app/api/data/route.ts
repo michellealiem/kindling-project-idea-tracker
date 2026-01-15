@@ -1,21 +1,13 @@
 // API route for full data sync
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllData, initializeSheets, isGoogleSheetsConfigured } from '@/lib/google-sheets';
-
-function isAuthenticated(request: NextRequest): boolean {
-  const authCookie = request.cookies.get('kindling_auth');
-  const sitePassword = process.env.SITE_PASSWORD;
-
-  // If no password is set, allow access (local dev)
-  if (!sitePassword) return true;
-
-  return authCookie?.value === 'authenticated';
-}
+import { checkAuth, unauthorizedResponse } from '@/lib/api-auth';
 
 // GET /api/data - Get all data (ideas, themes, learnings)
 export async function GET(request: NextRequest) {
-  if (!isAuthenticated(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = checkAuth(request);
+  if (!auth.authenticated) {
+    return unauthorizedResponse(auth.error);
   }
   // Check if Google Sheets is configured
   if (!isGoogleSheetsConfigured()) {
@@ -41,8 +33,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/data/init - Initialize sheets (run once to set up headers)
 export async function POST(request: NextRequest) {
-  if (!isAuthenticated(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = checkAuth(request);
+  if (!auth.authenticated) {
+    return unauthorizedResponse(auth.error);
   }
 
   try {
