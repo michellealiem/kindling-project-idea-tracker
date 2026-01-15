@@ -6,7 +6,6 @@ import { checkAuth, unauthorizedResponse } from '@/lib/api-auth';
 
 // Zod schema for update validation (all fields optional)
 const StageSchema = z.enum(['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused']);
-const IdeaTypeSchema = z.enum(['permasolution', 'project', 'experiment', 'learning']);
 const EffortSchema = z.enum(['trivial', 'small', 'medium', 'large', 'epic']);
 
 // Link schemas for PAIA integration
@@ -36,7 +35,6 @@ const UpdateIdeaSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   description: z.string().max(5000).optional(),
   stage: StageSchema.optional(),
-  type: IdeaTypeSchema.optional(),
   tags: z.array(z.string().max(50)).max(20).optional(),
   effort: EffortSchema.optional(),
   notes: z.string().max(10000).optional(),

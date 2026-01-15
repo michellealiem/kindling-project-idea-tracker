@@ -16,7 +16,6 @@ interface ChatBotProps {
     title: string;
     description: string;
     stage: string;
-    type: string;
     tags: string[];
     notes: string;
   }>;

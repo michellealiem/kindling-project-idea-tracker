@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Trash2, Sparkles, Zap, Flame, Lightbulb, CircleDot, Calendar, Search, Clock, Target, AlertCircle, Timer } from 'lucide-react';
-import { Idea, Stage, IdeaType, Effort, STAGE_CONFIG, EFFORT_CONFIG } from '@/lib/types';
+import { Idea, Stage, Effort, STAGE_CONFIG, EFFORT_CONFIG } from '@/lib/types';
 
 interface IdeaModalProps {
   idea: Idea | null;
@@ -17,7 +17,6 @@ interface IdeaModalProps {
 }
 
 const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
-const types: IdeaType[] = ['learning', 'experiment', 'project', 'permasolution']; // Still needed for AI categorization
 const efforts: Effort[] = ['trivial', 'small', 'medium', 'large', 'epic'];
 
 // Stage icons: Idea → Exploring → Active/Waiting/Simmering → Shipped → Paused
@@ -54,7 +53,6 @@ export function IdeaModal({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [stage, setStage] = useState<Stage>('spark');
-  const [type, setType] = useState<IdeaType>('permasolution');
   const [tags, setTags] = useState('');
   const [effort, setEffort] = useState<Effort>('medium');
   const [notes, setNotes] = useState('');
@@ -94,15 +92,11 @@ export function IdeaModal({
 
       // Parse the structured response
       const stageMatch = text.match(/STAGE:\s*(\w+)/i);
-      const typeMatch = text.match(/TYPE:\s*(\w+)/i);
       const tagsMatch = text.match(/TAGS:\s*([^\n]+)/i);
       const effortMatch = text.match(/EFFORT:\s*(\w+)/i);
 
       if (stageMatch && stages.includes(stageMatch[1] as Stage)) {
         setStage(stageMatch[1] as Stage);
-      }
-      if (typeMatch && types.includes(typeMatch[1] as IdeaType)) {
-        setType(typeMatch[1] as IdeaType);
       }
       if (tagsMatch) {
         setTags(tagsMatch[1].trim());
@@ -130,7 +124,6 @@ export function IdeaModal({
       setTitle(idea.title);
       setDescription(idea.description);
       setStage(idea.stage);
-      setType(idea.type);
       setTags(idea.tags.join(', '));
       setEffort(idea.effort);
       setNotes(idea.notes);
@@ -141,7 +134,6 @@ export function IdeaModal({
       setTitle('');
       setDescription('');
       setStage('spark');
-      setType('permasolution');
       setTags('');
       setEffort('medium');
       setNotes('');
@@ -160,7 +152,6 @@ export function IdeaModal({
       title: title.trim(),
       description: description.trim(),
       stage,
-      type,
       tags: tags
         .split(',')
         .map((t) => t.trim())
@@ -415,7 +406,7 @@ export function IdeaModal({
                 type="button"
                 disabled={aiLoading || !title.trim()}
                 onClick={() =>
-                  onAISuggest({ title, description, stage, type, tags: tags.split(',').map((t) => t.trim()).filter(Boolean) })
+                  onAISuggest({ title, description, stage, tags: tags.split(',').map((t) => t.trim()).filter(Boolean) })
                 }
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--spark)] to-[var(--primary)] text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >

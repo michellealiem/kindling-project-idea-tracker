@@ -70,17 +70,13 @@ Keep it actionable and encouraging. No fluff.`;
 export function buildProgressCheckPrompt(
   title: string,
   stage: string,
-  daysSinceUpdate: number,
-  type: string
+  daysSinceUpdate: number
 ): string {
   return `You are helping a builder reflect on a project they're working on.
 
 Project: ${title}
 Current stage: ${stage}
 Days since last update: ${daysSinceUpdate}
-Type: ${type}
-
-The builder has a pattern of being great at starting things but sometimes getting stuck in the "sustaining" phase. They prefer "permasolutions" that don't need ongoing maintenance.
 
 Provide a brief, supportive check-in (1-2 paragraphs) that:
 1. Acknowledges their progress
@@ -91,12 +87,12 @@ Be direct but kind. No fluff.`;
 }
 
 export function buildNewIdeaSuggestionsPrompt(
-  existingIdeas: { title: string; type: string; stage: string }[],
+  existingIdeas: { title: string; stage: string }[],
   themes: { title: string; description: string }[]
 ): string {
   const ideaSummary = existingIdeas
     .slice(0, 10)
-    .map((i) => `- ${i.title} (${i.type}, ${i.stage})`)
+    .map((i) => `- ${i.title} (${i.stage})`)
     .join('\n');
 
   const themeSummary = themes
@@ -114,8 +110,7 @@ ${themeSummary || '(no themes imported)'}
 
 Based on these patterns, suggest 2-3 new project ideas that:
 1. Align with their interests and themes
-2. Are "permasolutions" (build once, runs forever) when possible
-3. Are specific and actionable, not vague
+2. Are specific and actionable, not vague
 
 Format each idea as:
 **[Title]**: Brief description and why it fits their pattern.
@@ -160,15 +155,9 @@ Based on this, suggest the following. Be concise and direct:
    - shipped: Already complete (rare for new ideas)
    - paused: On hold for now
 
-2. **Type**: What kind of project is this?
-   - permasolution: Build once, runs forever with no maintenance
-   - project: Requires ongoing work/maintenance
-   - experiment: Quick test or prototype
-   - learning: Knowledge or skill acquisition
+2. **Tags**: Suggest 2-4 relevant tags (comma-separated, lowercase)
 
-3. **Tags**: Suggest 2-4 relevant tags (comma-separated, lowercase)
-
-4. **Effort**: Estimate the effort level
+3. **Effort**: Estimate the effort level
    - trivial: < 1 hour
    - small: 1-4 hours
    - medium: 1-2 days
@@ -177,7 +166,6 @@ Based on this, suggest the following. Be concise and direct:
 
 Respond in EXACTLY this format (one line each):
 STAGE: [stage]
-TYPE: [type]
 TAGS: [tag1, tag2, tag3]
 EFFORT: [effort]
 REASONING: [1 sentence explaining your choices]`;
@@ -185,7 +173,7 @@ REASONING: [1 sentence explaining your choices]`;
 
 // Dashboard insights prompt for portfolio analysis
 export function buildDashboardInsightsPrompt(
-  ideas: { title: string; type: string; stage: string; tags: string[] }[],
+  ideas: { title: string; stage: string; tags: string[] }[],
   themes: { title: string; description: string }[]
 ): string {
   // Group by stage
@@ -202,9 +190,6 @@ export function buildDashboardInsightsPrompt(
     )
     .join('\n');
 
-  const permasolutions = ideas.filter((i) => i.type === 'permasolution').length;
-  const needsMaintenance = ideas.filter((i) => i.type === 'project').length;
-
   const themeSummary =
     themes
       .slice(0, 3)
@@ -217,16 +202,14 @@ Portfolio breakdown:
 ${stageSummary}
 
 Total: ${ideas.length} ideas
-- Permasolutions (no maintenance): ${permasolutions}
-- Projects (needs maintenance): ${needsMaintenance}
 
 Recurring themes:
 ${themeSummary}
 
 Provide a brief analysis (2-3 short paragraphs) that:
-1. Identifies any patterns worth noting (too many ideas stuck in one stage? not enough permasolutions?)
+1. Identifies any patterns worth noting (too many ideas stuck in one stage?)
 2. Suggests what to focus on next
 3. Offers one actionable recommendation
 
-This builder prefers "permasolutions" that don't need ongoing maintenance. Be direct and practical.`;
+Be direct and practical.`;
 }

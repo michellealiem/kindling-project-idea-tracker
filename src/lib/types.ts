@@ -1,7 +1,6 @@
 // Core data types for Kindling - Where Ideas Catch Fire
 
 export type Stage = 'spark' | 'exploring' | 'building' | 'waiting' | 'simmering' | 'shipped' | 'paused';
-export type IdeaType = 'permasolution' | 'project' | 'experiment' | 'learning';
 export type Effort = 'trivial' | 'small' | 'medium' | 'large' | 'epic';
 
 export interface StageHistoryEntry {
@@ -37,7 +36,6 @@ export interface Idea {
   title: string;
   description: string;
   stage: Stage;
-  type: IdeaType;
   tags: string[];
   effort: Effort;
   notes: string;
@@ -149,32 +147,6 @@ export const STAGE_CONFIG: Record<Stage, { label: string; description: string; c
   },
 };
 
-export const TYPE_CONFIG: Record<IdeaType, { label: string; color: string; description: string; longDescription: string }> = {
-  learning: {
-    label: 'Torch',
-    color: 'text-[var(--primary)]',
-    description: 'Light the way',
-    longDescription: 'Knowledge acquisition - a skill, concept, or domain to explore and understand.'
-  },
-  experiment: {
-    label: 'Test Spark',
-    color: 'text-[var(--spark)]',
-    description: 'See if it catches',
-    longDescription: 'A quick test or prototype to validate an idea before committing more time.'
-  },
-  project: {
-    label: 'Campfire',
-    color: 'text-[var(--exploring)]',
-    description: 'Needs tending',
-    longDescription: 'A project requiring ongoing attention, updates, or maintenance to keep running.'
-  },
-  permasolution: {
-    label: 'Permasolution',
-    color: 'text-[var(--permasolution)]',
-    description: 'Build once, burns forever',
-    longDescription: 'A solution built once that runs indefinitely without ongoing maintenance. Set it up and forget it.'
-  },
-};
 
 export const EFFORT_CONFIG: Record<Effort, { label: string; description: string }> = {
   trivial: { label: 'Trivial', description: '< 1 hour' },
@@ -187,7 +159,6 @@ export const EFFORT_CONFIG: Record<Effort, { label: string; description: string 
 // Search/Filter types
 export interface SearchFilters {
   stages: Stage[];
-  types: IdeaType[];
   efforts: Effort[];
   tags: string[];
 }

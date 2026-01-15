@@ -22,7 +22,6 @@ interface SidebarProps {
       shipped: number;
       paused: number;
     };
-    permasolutions: number;
   } | null;
   onExport: () => void;
 }

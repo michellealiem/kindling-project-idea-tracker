@@ -182,12 +182,9 @@ export function getStats(data: AppData) {
     paused: data.ideas.filter((i) => i.stage === 'paused').length,
   };
 
-  const permasolutions = data.ideas.filter((i) => i.type === 'permasolution').length;
-
   return {
     total: data.ideas.length,
     byStage,
-    permasolutions,
     activeBuilding: byStage.building,
     themes: data.themes.length,
     learnings: data.learnings.length,

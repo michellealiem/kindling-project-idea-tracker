@@ -7,14 +7,12 @@ import { Idea } from '@/lib/types';
 
 // Zod schemas for input validation
 const StageSchema = z.enum(['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused']);
-const IdeaTypeSchema = z.enum(['permasolution', 'project', 'experiment', 'learning']);
 const EffortSchema = z.enum(['trivial', 'small', 'medium', 'large', 'epic']);
 
 const CreateIdeaSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
   description: z.string().max(5000, 'Description too long').optional().default(''),
   stage: StageSchema.optional().default('spark'),
-  type: IdeaTypeSchema.optional().default('experiment'),
   tags: z.array(z.string().max(50)).max(20, 'Too many tags').optional().default([]),
   effort: EffortSchema.optional().default('medium'),
   notes: z.string().max(10000, 'Notes too long').optional().default(''),
@@ -83,7 +81,6 @@ export async function POST(request: NextRequest) {
       title: validated.title,
       description: validated.description,
       stage: validated.stage,
-      type: validated.type,
       tags: validated.tags,
       effort: validated.effort,
       notes: validated.notes,

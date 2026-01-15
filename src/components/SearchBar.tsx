@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Search as SearchIcon, X, Filter, Zap, Flame, Lightbulb, CircleDot, Clock, Search } from 'lucide-react';
-import { Stage, IdeaType, Effort, STAGE_CONFIG, TYPE_CONFIG, EFFORT_CONFIG, SearchFilters } from '@/lib/types';
+import { Stage, Effort, STAGE_CONFIG, EFFORT_CONFIG, SearchFilters } from '@/lib/types';
 
 interface SearchBarProps {
   searchQuery: string;
@@ -13,7 +13,6 @@ interface SearchBarProps {
 }
 
 const stages: Stage[] = ['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused'];
-const types: IdeaType[] = ['permasolution', 'project', 'experiment', 'learning'];
 const efforts: Effort[] = ['trivial', 'small', 'medium', 'large', 'epic'];
 
 const stageIcons: Record<Stage, typeof Zap> = {
@@ -54,13 +53,6 @@ export function SearchBar({
     onFiltersChange({ ...filters, stages: newStages });
   };
 
-  const toggleType = (type: IdeaType) => {
-    const newTypes = filters.types.includes(type)
-      ? filters.types.filter((t) => t !== type)
-      : [...filters.types, type];
-    onFiltersChange({ ...filters, types: newTypes });
-  };
-
   const toggleEffort = (effort: Effort) => {
     const newEfforts = filters.efforts.includes(effort)
       ? filters.efforts.filter((e) => e !== effort)
@@ -76,17 +68,16 @@ export function SearchBar({
   };
 
   const clearFilters = () => {
-    onFiltersChange({ stages: [], types: [], efforts: [], tags: [] });
+    onFiltersChange({ stages: [], efforts: [], tags: [] });
   };
 
   const hasActiveFilters =
     filters.stages.length > 0 ||
-    filters.types.length > 0 ||
     filters.efforts.length > 0 ||
     filters.tags.length > 0;
 
   const activeFilterCount =
-    filters.stages.length + filters.types.length + filters.efforts.length + filters.tags.length;
+    filters.stages.length + filters.efforts.length + filters.tags.length;
 
   return (
     <div className="relative" ref={filterRef}>
@@ -160,32 +151,6 @@ export function SearchBar({
                     }`}
                   >
                     <Icon className="w-3 h-3" />
-                    {config.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Type filters */}
-          <div className="mb-4">
-            <label className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider mb-2 block">
-              Type
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {types.map((type) => {
-                const config = TYPE_CONFIG[type];
-                const isSelected = filters.types.includes(type);
-                return (
-                  <button
-                    key={type}
-                    onClick={() => toggleType(type)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      isSelected
-                        ? 'bg-[var(--primary)]/20 text-[var(--primary)]'
-                        : 'bg-[var(--background)] text-[var(--muted-foreground)] hover:bg-[var(--secondary)]'
-                    }`}
-                  >
                     {config.label}
                   </button>
                 );

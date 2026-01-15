@@ -3,7 +3,7 @@
 
 import { GoogleSpreadsheet, GoogleSpreadsheetRow } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
-import { Idea, Theme, Learning, AppData, Stage, IdeaType, Effort } from './types';
+import { Idea, Theme, Learning, AppData, Stage, Effort } from './types';
 
 // Check if Google Sheets is properly configured
 export function isGoogleSheetsConfigured(): boolean {
@@ -96,7 +96,6 @@ function rowToIdea(row: GoogleSpreadsheetRow<Record<string, string>>): Idea {
     title: row.get('title'),
     description: row.get('description') || '',
     stage: row.get('stage') as Stage,
-    type: row.get('type') as IdeaType,
     tags: tagsStr ? tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
     effort: row.get('effort') as Effort,
     notes: row.get('notes') || '',
@@ -124,7 +123,6 @@ function ideaToRow(idea: Idea): Record<string, string> {
     title: idea.title,
     description: idea.description || '',
     stage: idea.stage,
-    type: idea.type,
     tags: idea.tags.join(','),  // Store as comma-separated
     effort: idea.effort,
     notes: idea.notes || '',
@@ -373,7 +371,7 @@ export async function bulkSyncIdeas(ideas: Idea[]): Promise<{ created: number; s
 export async function initializeSheets(): Promise<void> {
   const doc = await getSpreadsheet();
 
-  const ideasHeaders = ['id', 'title', 'description', 'stage', 'type', 'tags', 'effort', 'notes', 'createdAt', 'updatedAt', 'startedAt', 'stageHistory', 'aiSuggestions', 'statusNote', 'memoryLinks', 'resourceLinks', 'personLinks'];
+  const ideasHeaders = ['id', 'title', 'description', 'stage', 'tags', 'effort', 'notes', 'createdAt', 'updatedAt', 'startedAt', 'stageHistory', 'aiSuggestions', 'statusNote', 'memoryLinks', 'resourceLinks', 'personLinks'];
   const themesHeaders = ['id', 'title', 'description', 'occurrences', 'keyMoments', 'linkedIdeas', 'source'];
   const learningsHeaders = ['id', 'date', 'title', 'context', 'discovery', 'actionable', 'linkedIdeas', 'source'];
 

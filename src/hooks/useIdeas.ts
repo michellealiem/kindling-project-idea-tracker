@@ -243,11 +243,6 @@ export function useIdeas() {
         results = results.filter((idea) => filters.stages.includes(idea.stage));
       }
 
-      // Filter by type
-      if (filters.types.length > 0) {
-        results = results.filter((idea) => filters.types.includes(idea.type));
-      }
-
       // Filter by effort
       if (filters.efforts.length > 0) {
         results = results.filter((idea) => filters.efforts.includes(idea.effort));

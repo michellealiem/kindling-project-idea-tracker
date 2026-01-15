@@ -5,7 +5,6 @@ import { bulkSyncIdeas, isGoogleSheetsConfigured } from '@/lib/google-sheets';
 
 // Zod schema for bulk sync validation
 const StageSchema = z.enum(['spark', 'exploring', 'building', 'waiting', 'simmering', 'shipped', 'paused']);
-const IdeaTypeSchema = z.enum(['permasolution', 'project', 'experiment', 'learning']);
 const EffortSchema = z.enum(['trivial', 'small', 'medium', 'large', 'epic']);
 
 const IdeaSchema = z.object({
@@ -13,7 +12,6 @@ const IdeaSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(5000),
   stage: StageSchema,
-  type: IdeaTypeSchema,
   tags: z.array(z.string().max(50)).max(20),
   effort: EffortSchema,
   notes: z.string().max(10000),

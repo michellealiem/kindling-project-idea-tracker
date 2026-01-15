@@ -15,7 +15,6 @@ import { Plus } from 'lucide-react';
 
 const emptyFilters: SearchFilters = {
   stages: [],
-  types: [],
   efforts: [],
   tags: [],
 };
@@ -99,7 +98,6 @@ export function AppProvider({ children }: AppProviderProps) {
   const isSearchActive =
     searchQuery.trim() !== '' ||
     searchFilters.stages.length > 0 ||
-    searchFilters.types.length > 0 ||
     searchFilters.efforts.length > 0 ||
     searchFilters.tags.length > 0;
 
@@ -243,7 +241,6 @@ export function AppProvider({ children }: AppProviderProps) {
             title: i.title,
             description: i.description,
             stage: i.stage,
-            type: i.type,
             tags: i.tags,
             notes: i.notes,
           }))}
