@@ -6,6 +6,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-14-B] - Type Field Removal & CLI Script
+
+### Removed
+
+**IdeaType Field Completely Removed:**
+- Removed entire type system (permasolution, project, experiment, learning) from codebase
+- Type was previously hidden from UI but still in data model for AI categorization
+- Now fully removed from all API schemas, storage, types, and components
+- Simplifies data model and reduces unnecessary categorization
+
+### Added
+
+**CLI Helper Script:**
+- `scripts/add-idea.sh` - Bash script to add ideas via API from command line
+- Supports optional stage and effort parameters
+- Uses `KINDLING_API_KEY` from `.env.local` or environment
+
+### Fixed
+
+**statusNote (Reason Field) Persistence:**
+- Fixed issue where statusNote wasn't persisting after page refresh
+- Added POST endpoint to `/api/data` for initializing sheet headers
+- Called `initializeSheets()` to add missing statusNote column to Google Sheet
+
+### Files Modified
+- `src/lib/types.ts` - Removed IdeaType, TYPE_CONFIG, type from Idea/SearchFilters
+- `src/app/api/ideas/route.ts` - Removed type from CreateIdeaSchema
+- `src/app/api/ideas/[id]/route.ts` - Removed type from UpdateIdeaSchema
+- `src/app/api/sync/route.ts` - Removed type from IdeaSchema
+- `src/app/api/data/route.ts` - Added POST handler with API key auth for sheet init
+- `src/lib/google-sheets.ts` - Removed type from headers, rowToIdea, ideaToRow
+- `src/lib/ollama.ts` - Removed type references from AI prompts
+- `src/lib/storage.ts` - Removed permasolutions stat
+- `src/components/IdeaModal.tsx` - Removed type state and selector UI
+- `src/components/SearchBar.tsx` - Removed type filter
+- `src/components/AppProvider.tsx` - Removed type from emptyFilters
+- `src/components/Sidebar.tsx` - Removed permasolutions from stats interface
+- `src/components/StatsCard.tsx` - Removed permasolution from StageType
+- `src/components/ChatBot.tsx` - Removed type from ideas prop interface
+- `src/hooks/useIdeas.ts` - Removed type filter logic
+
+### Files Created
+- `scripts/add-idea.sh` - CLI helper for adding ideas via API
+
+---
+
 ## [2026-01-14-A] - Design Refinements & PAIA API Integration
 
 ### Added
@@ -830,4 +876,4 @@ Surfaces at point of need on cards
 
 ---
 
-**Last Updated:** 2026-01-14A
+**Last Updated:** 2026-01-14B

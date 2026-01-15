@@ -1,10 +1,10 @@
 #!/bin/bash
 # Add a new idea to Kindling via API
-# Usage: ./scripts/add-idea.sh "Title" "Description" [stage] [type] [effort]
+# Usage: ./scripts/add-idea.sh "Title" "Description" [stage] [effort]
 #
 # Examples:
 #   ./scripts/add-idea.sh "My Idea" "Description here"
-#   ./scripts/add-idea.sh "My Idea" "Description" exploring experiment medium
+#   ./scripts/add-idea.sh "My Idea" "Description" exploring medium
 
 set -e
 
@@ -22,14 +22,12 @@ DESCRIPTION="$2"
 
 # Optional arguments with defaults
 STAGE="${3:-spark}"
-TYPE="${4:-experiment}"
-EFFORT="${5:-medium}"
+EFFORT="${4:-medium}"
 
 if [ -z "$TITLE" ]; then
-  echo "Usage: $0 \"Title\" \"Description\" [stage] [type] [effort]"
+  echo "Usage: $0 \"Title\" \"Description\" [stage] [effort]"
   echo ""
   echo "Stages: spark, exploring, building, waiting, simmering, shipped, paused"
-  echo "Types: permasolution, project, experiment, learning"
   echo "Effort: trivial, small, medium, large, epic"
   exit 1
 fi
@@ -40,7 +38,6 @@ JSON=$(cat <<EOF
   "title": "$TITLE",
   "description": "$DESCRIPTION",
   "stage": "$STAGE",
-  "type": "$TYPE",
   "effort": "$EFFORT"
 }
 EOF
