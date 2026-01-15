@@ -105,8 +105,7 @@ function buildSystemPrompt(context: ChatContext): string {
     : '(No learnings imported yet)';
 
   return 'You are Kindling Companion, a helpful AI assistant for Michelle\'s idea tracker app called Kindling.\n\n' +
-    'Michelle is a builder who is great at starting things but sometimes struggles with sustaining them. ' +
-    'She prefers "permasolutions" - things you build once that run forever without ongoing maintenance.\n\n' +
+    'Michelle is a builder who is great at starting things but sometimes struggles with sustaining them.\n\n' +
     'You have access to her current project data:\n\n' +
     'IDEAS BY STAGE:\n' + (ideaSummary || '(No ideas yet)') + '\n\n' +
     'RECURRING THEMES:\n' + themeSummary + '\n\n' +
@@ -115,7 +114,7 @@ function buildSystemPrompt(context: ChatContext): string {
     '1. Help Michelle explore patterns and connections in her ideas\n' +
     '2. Answer questions about her projects, themes, and learnings\n' +
     '3. Suggest which sparks might be worth pursuing\n' +
-    '4. Identify if any projects might be "sustainer traps" (require ongoing maintenance)\n' +
+    '4. Identify if any projects might require ongoing maintenance vs one-time builds\n' +
     '5. Be direct, practical, and encouraging - no fluff\n\n' +
     'When searching for ideas, match against titles, descriptions, tags, and notes.\n' +
     'Keep responses concise (2-3 paragraphs max) unless asked for detail.\n' +

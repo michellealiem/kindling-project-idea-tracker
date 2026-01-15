@@ -129,22 +129,27 @@ export function useIdeas() {
   }, [useApi]);
 
   const deleteIdea = useCallback(async (id: string) => {
-    // Optimistically update local state
+    // If using API, wait for confirmation before updating local state
+    if (useApi) {
+      try {
+        const response = await fetch(`/api/ideas/${id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          console.error('Failed to delete from cloud');
+          return; // Don't update local state if API failed
+        }
+      } catch (error) {
+        console.error('Failed to sync delete to API:', error);
+        return; // Don't update local state if API failed
+      }
+    }
+
+    // Only update local state after successful API delete (or if not using API)
     setData((prev) => {
       if (!prev) return prev;
       return deleteIdeaFromLocalData(prev, id);
     });
-
-    // Try to sync with API
-    if (useApi) {
-      try {
-        await fetch(`/api/ideas/${id}`, {
-          method: 'DELETE',
-        });
-      } catch (error) {
-        console.error('Failed to sync delete to API:', error);
-      }
-    }
   }, [useApi]);
 
   // Theme operations

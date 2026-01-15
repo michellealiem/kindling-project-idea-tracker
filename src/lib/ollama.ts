@@ -62,7 +62,6 @@ Description: ${description || '(no description yet)'}
 Provide a brief, practical response (2-3 paragraphs) that:
 1. Identifies the core problem or opportunity
 2. Suggests 2-3 concrete next steps to explore this idea
-3. Notes if this could be a "permasolution" (build once, runs forever) or needs ongoing maintenance
 
 Keep it actionable and encouraging. No fluff.`;
 }

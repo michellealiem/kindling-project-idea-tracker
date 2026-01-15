@@ -51,8 +51,6 @@
   --paused-border: #64748b;
 
   /* Special */
-  --permasolution: #c9a227;  /* Antique gold - lasting value */
-  --permasolution-bg: #fdf9ed;
 
   /* Accent for interactions */
   --accent: #e07b39;
@@ -109,7 +107,6 @@
   --paused: #94a3b8;
   --paused-bg: #1e293b;
   --paused-border: #94a3b8;
-  --permasolution-bg: #2d2820;
 }
 
 /* Fallback for system preference when no class is set */
@@ -149,7 +146,6 @@
     --paused: #94a3b8;
     --paused-bg: #1e293b;
     --paused-border: #94a3b8;
-    --permasolution-bg: #2d2820;
   }
 }
 
@@ -264,12 +260,6 @@ body {
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
-}
-
-/* Shimmer for permasolution badge */
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
 }
 
 /* Pulse ring for active items */
@@ -430,23 +420,6 @@ body {
 .focus-ring:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
-}
-
-/* Permasolution shimmer badge */
-.perma-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--permasolution) 0%,
-    #dbb844 25%,
-    var(--permasolution) 50%,
-    #dbb844 75%,
-    var(--permasolution) 100%
-  );
-  background-size: 200% auto;
-  animation: shimmer 4s linear infinite;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* Stage indicator dots with hover */
