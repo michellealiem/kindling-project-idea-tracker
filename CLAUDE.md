@@ -17,6 +17,21 @@
 - **AI**: Local Ollama (optional)
 - **Hosting**: Netlify (auto-deploy from GitHub)
 
+## Context7 Documentation Lookup
+
+Use `context7` MCP server **only when needed** to minimize token usage.
+
+✅ **Use for:** Unfamiliar APIs, debugging library errors, migration guides
+❌ **Skip for:** Basic syntax, working code, simple operations
+
+| Library | Context7 ID | When to Query |
+|---------|-------------|---------------|
+| Next.js | `/vercel/next.js` | App Router, Server Actions, API routes |
+| Tailwind CSS | `/websites/tailwindcss` | Complex utilities, plugins |
+| dnd-kit | `/websites/next_dndkit` | Drag & drop, sortable lists |
+
+**Tips:** Be specific ("dnd-kit sortable with keyboard" not "dnd-kit"). Fallback to web search if needed.
+
 ## File Structure
 
 ```
