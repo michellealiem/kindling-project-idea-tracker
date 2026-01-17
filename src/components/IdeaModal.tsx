@@ -111,11 +111,13 @@ export function IdeaModal({
     }
   };
 
-  // Get today's date in PST/California timezone
-  const getTodayPST = () => {
+  // Get today's date in local timezone as YYYY-MM-DD
+  const getTodayLocal = () => {
     const now = new Date();
-    const pstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    return pstDate.toISOString().split('T')[0];
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Reset form when modal opens/closes or idea changes
@@ -138,8 +140,8 @@ export function IdeaModal({
       setEffort('medium');
       setNotes('');
       setStatusNote('');
-      // Auto-populate with today's date in PST
-      setStartedAt(getTodayPST());
+      // Auto-populate with today's date in local timezone
+      setStartedAt(getTodayLocal());
     }
     setShowDeleteConfirm(false);
   }, [idea, isOpen]);
@@ -380,7 +382,7 @@ export function IdeaModal({
               type="date"
               value={startedAt}
               onChange={(e) => setStartedAt(e.target.value)}
-              max={new Date().toISOString().split('T')[0]}
+              max={getTodayLocal()}
               className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
             />
           </div>

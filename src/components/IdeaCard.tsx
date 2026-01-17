@@ -37,7 +37,11 @@ export function IdeaCard({ idea, onClick, compact = false }: IdeaCardProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Compare dates in local timezone by using date-only components
+    const dateLocal = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const nowLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.floor((nowLocal.getTime() - dateLocal.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';

@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-16] - Timezone Date Fix
+
+### Fixed
+
+**Date Display Timezone Issues:**
+- Fixed "Today/Yesterday" labels showing incorrect dates near midnight in PST
+- `IdeaCard.tsx`: Updated `formatDate()` to compare dates using local timezone components instead of UTC timestamps
+- `IdeaModal.tsx`: Fixed `getTodayLocal()` function that was incorrectly converting to PST then back to UTC
+- `IdeaModal.tsx`: Fixed date picker `max` attribute to use local timezone
+
+**Root Cause:**
+JavaScript's `toISOString()` always returns UTC time, so dates near midnight in PST (UTC-8) would display as the wrong day. The fix extracts local date components (year, month, day) before comparison.
+
+### Files Modified
+- `src/components/IdeaCard.tsx` - Fixed formatDate() timezone handling
+- `src/components/IdeaModal.tsx` - Fixed getTodayLocal() and date picker max
+
+---
+
 ## [2026-01-14-B] - Type Field Removal & CLI Script
 
 ### Removed
@@ -876,4 +895,4 @@ Surfaces at point of need on cards
 
 ---
 
-**Last Updated:** 2026-01-14B
+**Last Updated:** 2026-01-16
