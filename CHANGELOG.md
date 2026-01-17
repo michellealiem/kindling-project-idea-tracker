@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-01-17] - Project Scanner Workflow
+
+### Added
+
+**Claude Code Project Scanner:**
+- New workflow to scan all project CHANGELOGs and update Kindling cards with activity summaries
+- Trigger phrases: "scan projects", "update kindling", "sync project progress"
+- Matches project folders to Kindling cards by fuzzy name matching
+- Shows proposed updates for user approval before applying
+- Tracks last scan date to only show recent activity
+
+**Security:**
+- API key moved from hardcoded to `KINDLING_API_KEY` environment variable
+- Added to `~/.zshrc` for shell sessions
+
+### Documentation
+- Added Project Scanner section to CLAUDE.md
+- Instructions live in global `~/.claude/CLAUDE.md` so scanner works from any folder
+
+---
+
 ## [2026-01-16] - Timezone Date Fix
 
 ### Fixed

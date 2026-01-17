@@ -127,6 +127,23 @@ Import themes and learnings from PAIA memory files:
 
 Use the Import button in the sidebar → PAIA Themes/Learnings tab.
 
+## Project Scanner (Claude Workflow)
+
+A Claude Code workflow exists to scan all project changelogs and update Kindling cards with recent activity summaries.
+
+**Trigger phrases:** "scan projects", "update kindling", "sync project progress"
+
+**How it works:**
+1. Scans `CHANGELOG.md` files across all AI project folders
+2. Matches projects to Kindling cards by folder name
+3. Extracts recent activity since last scan
+4. Shows proposed note updates for approval
+5. Updates cards via API
+
+**Instructions location:** `~/.claude/CLAUDE.md` (global config)
+
+**API key:** Uses `KINDLING_API_KEY` environment variable
+
 ---
 
-**Last Updated:** 2026-01-10
+**Last Updated:** 2026-01-17
