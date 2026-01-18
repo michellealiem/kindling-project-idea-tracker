@@ -227,6 +227,33 @@ tmux new -s dev
 tmux attach -t dev
 ```
 
+### pm2 for Dev Servers (Underrated Trick)
+
+Use pm2 to run dev servers instead of blocking the terminal. Claude can easily search logs while efficiently managing context window.
+
+```bash
+# Install pm2 globally
+npm install -g pm2
+
+# Start dev server with pm2
+pm2 start "npm run dev" --name "dev-server"
+
+# View logs (Claude can search these)
+pm2 logs dev-server
+
+# Other useful commands
+pm2 list          # See all processes
+pm2 stop dev-server
+pm2 restart dev-server
+pm2 delete dev-server
+```
+
+**Benefits:**
+- Dev server runs in background without blocking Claude
+- Logs are searchable and don't consume context window
+- Easy to restart/stop without losing conversation state
+- Multiple servers can run simultaneously
+
 ---
 
 ## Useful Commands
