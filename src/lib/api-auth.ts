@@ -36,18 +36,19 @@ export function checkAuth(request: NextRequest): AuthResult {
   const sitePassword = process.env.SITE_PASSWORD;
   const apiKey = process.env.KINDLING_API_KEY;
 
-  // If no auth is configured, allow all (local dev)
-  if (!sitePassword && !apiKey) {
+  // If no site password is set, allow browser users (no cookie needed)
+  // API key is only for external API access (PAIA), not browser auth
+  if (!sitePassword) {
     return { authenticated: true, method: 'none' };
   }
 
-  // Check cookie auth first
+  // Check cookie auth first (required when SITE_PASSWORD is set)
   const authCookie = request.cookies.get('kindling_auth');
   if (authCookie?.value === 'authenticated') {
     return { authenticated: true, method: 'cookie' };
   }
 
-  // Check API key auth
+  // Check API key auth (for external API access like PAIA)
   if (apiKey) {
     // Check Authorization header
     const authHeader = request.headers.get('Authorization');
