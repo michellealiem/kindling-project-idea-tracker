@@ -39,7 +39,7 @@ export function useIdeas() {
     async function loadData() {
       if (useApi) {
         try {
-          const response = await fetch('/api/data');
+          const response = await fetch('/api/data', { credentials: 'include' });
           if (response.ok) {
             const apiData = await response.json();
             setData(apiData);
@@ -88,6 +88,7 @@ export function useIdeas() {
         const response = await fetch('/api/ideas', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(idea),
         });
         if (response.ok) {
@@ -100,9 +101,15 @@ export function useIdeas() {
               ideas: prev.ideas.map(i => i.id === localIdea.id ? apiIdea : i)
             };
           });
+          setSyncError(null);
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Failed to sync new idea:', response.status, errorData);
+          setSyncError(`Sync failed: ${errorData.error || response.statusText}`);
         }
       } catch (error) {
         console.error('Failed to sync new idea to API:', error);
+        setSyncError('Sync failed - network error');
       }
     }
   }, [useApi]);
@@ -117,13 +124,22 @@ export function useIdeas() {
     // Try to sync with API
     if (useApi) {
       try {
-        await fetch(`/api/ideas/${id}`, {
+        const response = await fetch(`/api/ideas/${id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(updates),
         });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Failed to sync update:', response.status, errorData);
+          setSyncError(`Sync failed: ${errorData.error || response.statusText}`);
+        } else {
+          setSyncError(null);
+        }
       } catch (error) {
         console.error('Failed to sync update to API:', error);
+        setSyncError('Sync failed - network error');
       }
     }
   }, [useApi]);
@@ -134,13 +150,18 @@ export function useIdeas() {
       try {
         const response = await fetch(`/api/ideas/${id}`, {
           method: 'DELETE',
+          credentials: 'include',
         });
         if (!response.ok) {
-          console.error('Failed to delete from cloud');
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Failed to delete from cloud:', response.status, errorData);
+          setSyncError(`Delete failed: ${errorData.error || response.statusText}`);
           return; // Don't update local state if API failed
         }
+        setSyncError(null);
       } catch (error) {
         console.error('Failed to sync delete to API:', error);
+        setSyncError('Delete failed - network error');
         return; // Don't update local state if API failed
       }
     }
@@ -281,12 +302,15 @@ export function useIdeas() {
     }
 
     try {
-      const response = await fetch('/api/data');
+      const response = await fetch('/api/data', { credentials: 'include' });
       if (response.ok) {
         const apiData = await response.json();
         setData(apiData);
         setSyncError(null);
         return true;
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setSyncError(`Sync failed: ${errorData.error || response.statusText}`);
       }
     } catch (error) {
       setSyncError('Failed to sync with Google Sheets');
