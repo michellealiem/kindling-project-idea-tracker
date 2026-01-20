@@ -23,6 +23,10 @@ const IdeaSchema = z.object({
     date: z.string(),
   })),
   aiSuggestions: z.array(z.string()).optional(),
+  statusNote: z.string().max(500).optional(),
+  memoryLinks: z.array(z.any()).optional(),
+  resourceLinks: z.array(z.any()).optional(),
+  personLinks: z.array(z.any()).optional(),
 });
 
 const BulkSyncSchema = z.object({
