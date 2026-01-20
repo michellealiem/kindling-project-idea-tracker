@@ -19,7 +19,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await getAllData();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' }
+    });
   } catch (error) {
     console.error('Failed to fetch data:', error);
     const isDev = process.env.NODE_ENV === 'development';
