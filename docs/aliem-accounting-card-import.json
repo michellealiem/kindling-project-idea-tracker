@@ -1,0 +1,52 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-02-06T00:00:00.000Z",
+  "ideas": [
+    {
+      "id": "1738800000000-aliem-acct",
+      "title": "ALiEM Simple Accounting",
+      "description": "Replace $20/month Xero subscription with a self-hosted permasolution for ALiEM LLC accounting. Tracks expenses by Schedule C category, auto-imports transactions from Ally, BofA (2 accounts), and Chase Business Ink via SimpleFIN ($15/year). Generates annual tax summaries for accountant. Single-user, runs on Mac Studio, Dropbox-synced for backup.",
+      "stage": "spark",
+      "tags": ["permasolution", "finance", "automation", "aliem", "tax"],
+      "effort": "large",
+      "notes": "## Why\n- Xero costs $240/year, way overkill for simple LLC with ~10-15 expenses/month\n- Downgraded from S-Corp to LLC, no longer need payroll/contractor features\n- Only need: expense categorization, income tracking, Schedule C summary\n\n## Key Design Decisions\n- **SimpleFIN ($15/year) NOT Plaid (~$500/month)** for bank sync\n- **localStorage + Dropbox backup** (repo lives in Dropbox folder)\n- **Same stack as Kindling** (Next.js 14, Tailwind, Lucide)\n- **Local-only** — no deployment needed, runs on Mac Studio\n- **No auth needed** — single user, local browser\n\n## Accounts\n- Ally Checking\n- BofA Savings\n- BofA Checking\n- Chase Business Ink (credit card)\n\n## Income Sources\n- Google AdSense (monthly, direct deposit)\n- Amazon Affiliates (monthly, direct deposit)\n- Sponsors (~2x/year, physical check)\n\n## Build Phases\n1. **MVP**: Manual entry + CSV import + Schedule C categories + dashboard\n2. **Automation**: SimpleFIN integration + vendor rules + auto-categorize\n3. **Tax Reporting**: Schedule C summary + quarterly P&L + annual export\n4. **Polish**: Search, bulk categorize, split transactions, charts\n\n## Cost Savings\n- Current: $240/year (Xero)\n- New: $15/year (SimpleFIN)\n- Savings: $225/year forever\n\n## Full spec: docs/aliem-accounting-app-spec.md",
+      "createdAt": "2026-02-06T00:00:00.000Z",
+      "updatedAt": "2026-02-06T00:00:00.000Z",
+      "stageHistory": [
+        {
+          "stage": "spark",
+          "date": "2026-02-06T00:00:00.000Z"
+        }
+      ],
+      "resourceLinks": [
+        {
+          "id": "res-simplefin",
+          "type": "article",
+          "title": "SimpleFIN Bridge - Bank Connection API",
+          "url": "https://simplefin.org",
+          "note": "$15/year alternative to Plaid for automated bank/CC transaction import"
+        },
+        {
+          "id": "res-schedule-c",
+          "type": "article",
+          "title": "IRS Schedule C Instructions",
+          "url": "https://www.irs.gov/instructions/i1040sc",
+          "note": "Expense categories for single-member LLC tax filing"
+        },
+        {
+          "id": "res-spec",
+          "type": "article",
+          "title": "Full Build Spec",
+          "url": "docs/aliem-accounting-app-spec.md",
+          "note": "Detailed architecture, data models, security considerations, and phased build plan"
+        }
+      ]
+    }
+  ],
+  "themes": [],
+  "learnings": [],
+  "settings": {
+    "defaultView": "dashboard",
+    "ollamaModel": "llama3.1:8b"
+  }
+}
